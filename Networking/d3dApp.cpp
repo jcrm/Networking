@@ -232,7 +232,8 @@ void D3DApp::updateScene(float dt)
 	if(GetAsyncKeyState('S') & 0x8000)	thisCamera.MoveBack();
 	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
 	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
-
+	
+	/*
 	if(frameCnt%50==0){
 		//look around the screen using the mouse
 		if(MousePos.x < (50)){
@@ -247,7 +248,7 @@ void D3DApp::updateScene(float dt)
 		else if(MousePos.y > (mClientHeight-50)){
 			thisCamera.OnlyPitch(-2);
 		}
-	}
+	}*/
 }
 
 void D3DApp::drawScene()
@@ -394,6 +395,13 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		case 'P':
 			{
 				ShowWin32Console();
+				break;
+			}
+		case 'T':
+			{
+				cout << "T keypress\n";
+				appSockets.SendAll();
+				appSockets.RedrawText();
 				break;
 			}
 		case 'Y':

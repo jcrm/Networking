@@ -189,6 +189,15 @@ void SOCKETS::SendTo(){
 	CommonSend();
 	int n = sendto(s, Buffer, BUFFERSIZE, 0, (struct sockaddr *)&m_RemoteAddress, m_SocketAddressSize);
 }
+void SOCKETS::SendAll(){
+	int temp=0;
+	for(it=SIDS.begin(); it!=SIDS.end(); it++){
+		sprintf(MyPacket.Text,"TEST%d",temp);
+		m_RemoteAddress = it->sin_addr;
+		SendTo();
+		temp++;
+	}
+}
 void SOCKETS::CommonSend(){
 	if(!Server){
 		MyPacket.CID = LocalPacket.CID;
@@ -236,6 +245,7 @@ void SOCKETS::CommonRead(){
 	memcpy(&MyPacket, Buffer, sizeof(MyPackets));
 	InitRead();
 	printf("Received Packet with ID -> %d\n", MyPacket.PID);
+	printf("Msg %s\n", MyPacket.Text);
 	printf("From -> %d\n", MyPacket.CID);
 }
 void SOCKETS::ChangeText(std::wstring net){

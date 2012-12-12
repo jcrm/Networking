@@ -43,6 +43,7 @@ public:
 	SOCKET GetSocket();
 	MyPackets MyPacket;
 	void SetDestinationAddress(char * IP, const int Port);
+	void SendAll();
 	bool CheckList();
 private:
 	bool UDP;
