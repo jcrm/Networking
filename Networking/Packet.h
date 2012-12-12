@@ -14,6 +14,7 @@ public:
 	
 	MyPackets();
 	~MyPackets();
+	void UpdatePos();
 };
 
 

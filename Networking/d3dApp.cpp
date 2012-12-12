@@ -208,31 +208,7 @@ void D3DApp::updateScene(float dt)
 		// Reset for next average.
 		frameCnt = 0;
 		t_base  += 1.0f;
-	}
-	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
-		thisTriangle.Translate(thisTriangle.GetPosX(),thisTriangle.GetPosY()-0.001,thisTriangle.GetPosZ());
-		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()-0.001,thisCube.GetPosZ());
-	}
-	if(GetAsyncKeyState(VK_UP) & 0x8000){
-		thisTriangle.Translate(thisTriangle.GetPosX(),thisTriangle.GetPosY()+0.001,thisTriangle.GetPosZ());
-		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()+0.001,thisCube.GetPosZ());
-	}
-	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
-		thisTriangle.Translate(thisTriangle.GetPosX()-0.001,thisTriangle.GetPosY(),thisTriangle.GetPosZ());
-		thisCube.Translate(thisCube.GetPosX()-0.001,thisCube.GetPosY(),thisCube.GetPosZ());
-	}
-	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
-		thisTriangle.Translate(thisTriangle.GetPosX()+0.001,thisTriangle.GetPosY(),thisTriangle.GetPosZ());
-		thisCube.Translate(thisCube.GetPosX()+0.001,thisCube.GetPosY(),thisCube.GetPosZ());
-	}
-	// Update angles based on input to orbit camera around scene.
-	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
-	if(GetAsyncKeyState('D') & 0x8000)	thisCamera.MoveRight();
-	if(GetAsyncKeyState('W') & 0x8000)	thisCamera.MoveForward();
-	if(GetAsyncKeyState('S') & 0x8000)	thisCamera.MoveBack();
-	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
-	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
-	
+	}	
 	/*
 	if(frameCnt%50==0){
 		//look around the screen using the mouse
@@ -370,94 +346,7 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		MousePos.x = LOWORD (lParam);
 		MousePos.y = HIWORD (lParam);
 		return 0;
-	case WM_KEYDOWN:
-		switch(wParam)
-		{
-		case VK_ESCAPE:
-			{
-				//system("pause");
-				PostQuitMessage(0);
-				break;
-			}
-		case VK_F1:
-			{
-				cout << "F1 keypress\n";
-				appSockets.SendTo();
-				appSockets.RedrawText();
-				break;
-			}
-		case 'C':
-			{
-				appSockets.Connect();
-				appSockets.RedrawText();
-				break;
-			}
-		case 'P':
-			{
-				ShowWin32Console();
-				break;
-			}
-		case 'T':
-			{
-				cout << "T keypress\n";
-				appSockets.SendAll();
-				appSockets.RedrawText();
-				break;
-			}
-		case 'Y':
-			{
-				if(!appSockets.GetInit()){
-					cout << "create server";
-					appSockets.init(0);
-					appSockets.SetAsync(mhMainWnd);
-					appSockets.RedrawText();
-				}
-				break;
-			}
-		case 'N':
-			{
-				if(!appSockets.GetInit()){
-					cout << "create client";
-					appSockets.init(1);
-					appSockets.SetAsync(mhMainWnd);
-					appSockets.RedrawText();
-				}
-				break;
-			}
-		}
-			
-		break;
-
-	case WM_SOCKET:
-		if (WSAGETSELECTERROR(lParam))
-		{
-			appSockets.Error(mhMainWnd);
-			PostQuitMessage (0);
-			return 0;
-		}
-
-		switch (WSAGETSELECTEVENT(lParam))
-		{
-			case FD_ACCEPT:{
-					appSockets.Accept(wParam);
-					break;
-				}//end case FD_ACCePT
-			case FD_CONNECT:{
-					appSockets.SConnected();
-					break;
-				}//end case FD_CONNECT
-			case FD_READ:{
-					appSockets.ReadFrom(wParam);
-					break;
-				}//end case FD_READ
-
-			case FD_CLOSE:{
-					appSockets.Close(1);
-					break;
-				}//end case FD_CLOSE
-		}
 	}
-
 
 	return DefWindowProc(mhMainWnd, msg, wParam, lParam);
 }

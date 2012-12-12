@@ -21,7 +21,7 @@ public:
 	ID3D10Buffer* mVB;
 	ID3D10Buffer* mIB;
 	int scale;
-
+	LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam);
 	void initApp();
 	void onResize();
 	void updateScene(float dt);
@@ -102,9 +102,97 @@ void NetworkApp::onResize()
 	//create projection matrix from field of view
 	D3DXMatrixPerspectiveFovLH(&mProj, 0.25f*PI, aspect, 1.0f, 1000.0f);
 }
-
+LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
+	switch(msg){
+	case WM_SOCKET:
+		if (WSAGETSELECTERROR(lParam)){
+			appSockets.Error(mhMainWnd);
+			PostQuitMessage (0);
+			return 0;
+		}
+		switch (WSAGETSELECTEVENT(lParam)){
+			case FD_ACCEPT:{
+					appSockets.Accept(wParam);
+					break;
+				}//end case FD_ACCePT
+			case FD_CONNECT:{
+					appSockets.SConnected();
+					break;
+				}//end case FD_CONNECT
+			case FD_READ:{
+					appSockets.ReadFrom(wParam);
+					break;
+				}//end case FD_READ
+			case FD_CLOSE:{
+					appSockets.Close(1);
+					break;
+				}//end case FD_CLOSE
+		}
+	}
+	return D3DApp::msgProc(msg, wParam, lParam);
+}
 void NetworkApp::updateScene(float dt)
 {
+
+	if(GetAsyncKeyState(VK_ESCAPE)& 0x8000){
+		//system("pause");
+		PostQuitMessage(0);
+	}else if(GetAsyncKeyState(VK_F1)& 0x8000){
+		cout << "F1 keypress\n";
+		appSockets.SendTo();
+		appSockets.RedrawText();
+	}
+	if(GetAsyncKeyState('C')& 0x8000){
+		appSockets.Connect();
+		appSockets.RedrawText();
+	}
+	if(GetAsyncKeyState('P')& 0x8000){
+		ShowWin32Console();
+	}
+	if(GetAsyncKeyState('T')& 0x8000){
+		cout << "T keypress\n";
+		appSockets.SendAll();
+		appSockets.RedrawText();
+	}
+	if(GetAsyncKeyState('Y')& 0x8000){
+		if(!appSockets.GetInit()){
+			cout << "create server";
+			appSockets.init(0);
+			appSockets.SetAsync(mhMainWnd);
+			appSockets.RedrawText();
+		}
+	}
+	if(GetAsyncKeyState('N')& 0x8000){
+		if(!appSockets.GetInit()){
+			cout << "create client";
+			appSockets.init(1);
+			appSockets.SetAsync(mhMainWnd);
+			appSockets.RedrawText();
+		}
+	}
+				
+	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
+		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()-0.001,thisCube.GetPosZ());
+	}
+	if(GetAsyncKeyState(VK_UP) & 0x8000){
+		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()+0.001,thisCube.GetPosZ());
+	}
+	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
+		thisCube.Translate(thisCube.GetPosX()-0.001,thisCube.GetPosY(),thisCube.GetPosZ());
+	}
+	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
+		thisCube.Translate(thisCube.GetPosX()+0.001,thisCube.GetPosY(),thisCube.GetPosZ());
+	}
+	// Update angles based on input to orbit camera around scene.
+	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
+	if(GetAsyncKeyState('D') & 0x8000)	thisCamera.MoveRight();
+	if(GetAsyncKeyState('W') & 0x8000)	thisCamera.MoveForward();
+	if(GetAsyncKeyState('S') & 0x8000)	thisCamera.MoveBack();
+	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
+	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
+
+
+
 	D3DApp::updateScene(dt);
 
 	thisCamera.Update();

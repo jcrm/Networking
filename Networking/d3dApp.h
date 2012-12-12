@@ -65,6 +65,7 @@ protected:
 	GameTimer	mTimer;
 	Triangle	thisTriangle;
 	Triangle	thatTriangle;
+	std::list<Cube> CubeList;
 	Cube		thisCube;
 	Sphere		thisSphere;
 	Camera		thisCamera;
