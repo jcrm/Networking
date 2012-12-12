@@ -202,6 +202,7 @@ void SOCKETS::CommonSend(){
 	if(!Server){
 		MyPacket.CID = LocalPacket.CID;
 		MyPacket.PID = LocalPacket.PID++;
+		MyPacket.pos = LocalPacket.pos;
 		printf("Sent Packet with ID -> %d\n", MyPacket.PID);
 	}
 	memcpy(Buffer, &MyPacket, sizeof(MyPackets));
@@ -296,6 +297,15 @@ bool SOCKETS::CheckList(){
 	SIDS.push_back(temp);
 	return false;
 }
+void SOCKETS::UpdatePacket(D3DXVECTOR3 temp){
+	LocalPacket.pos=temp;
+}
+void SOCKETS::UpdatePacket(float x, float y, float z){
+	LocalPacket.pos.x+=x;
+	LocalPacket.pos.y+=y;
+	LocalPacket.pos.z+=z;
+}
+
 /*
 bool checklist(sockaddr_in temp1, char msg[PACKETSIZE]){
 	id temp;

@@ -44,7 +44,10 @@ public:
 	MyPackets MyPacket;
 	void SetDestinationAddress(char * IP, const int Port);
 	void SendAll();
+	void UpdatePacket(D3DXVECTOR3 temp);
+	void UpdatePacket(float x, float y, float z);
 	bool CheckList();
+
 private:
 	bool UDP;
 	SOCKET s;

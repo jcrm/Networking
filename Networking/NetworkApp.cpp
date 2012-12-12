@@ -121,6 +121,10 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 				}//end case FD_CONNECT
 			case FD_READ:{
 					appSockets.ReadFrom(wParam);
+					if(appSockets.CheckType()){
+						MyPackets temp = appSockets.MyPacket;
+						thisCube.Translate(temp.pos.x, temp.pos.y, temp.pos.z);
+					}
 					break;
 				}//end case FD_READ
 			case FD_CLOSE:{
@@ -173,15 +177,19 @@ void NetworkApp::updateScene(float dt)
 				
 	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
 		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()-0.001,thisCube.GetPosZ());
+		appSockets.UpdatePacket(thisCube.pos);
 	}
 	if(GetAsyncKeyState(VK_UP) & 0x8000){
 		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()+0.001,thisCube.GetPosZ());
+		appSockets.UpdatePacket(thisCube.pos);
 	}
 	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
 		thisCube.Translate(thisCube.GetPosX()-0.001,thisCube.GetPosY(),thisCube.GetPosZ());
+		appSockets.UpdatePacket(thisCube.pos);
 	}
 	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
 		thisCube.Translate(thisCube.GetPosX()+0.001,thisCube.GetPosY(),thisCube.GetPosZ());
+		appSockets.UpdatePacket(thisCube.pos);
 	}
 	// Update angles based on input to orbit camera around scene.
 	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
@@ -190,7 +198,6 @@ void NetworkApp::updateScene(float dt)
 	if(GetAsyncKeyState('S') & 0x8000)	thisCamera.MoveBack();
 	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
 	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
-
 
 
 	D3DApp::updateScene(dt);

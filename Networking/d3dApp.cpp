@@ -209,8 +209,11 @@ void D3DApp::updateScene(float dt)
 		frameCnt = 0;
 		t_base  += 1.0f;
 	}	
-	/*
 	if(frameCnt%50==0){
+		if(!appSockets.CheckType()){
+			appSockets.SendTo();
+		}
+		/*
 		//look around the screen using the mouse
 		if(MousePos.x < (50)){
 			thisCamera.OnlyYaw(-2);
@@ -223,8 +226,8 @@ void D3DApp::updateScene(float dt)
 		}
 		else if(MousePos.y > (mClientHeight-50)){
 			thisCamera.OnlyPitch(-2);
-		}
-	}*/
+		}*/
+	}
 }
 
 void D3DApp::drawScene()
