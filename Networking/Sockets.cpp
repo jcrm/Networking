@@ -3,14 +3,16 @@
 
 SOCKETS::SOCKETS(){
 	Initialised = false;
+	m_SocketAddressSize = sizeof(sockaddr_in);
 	std::wostringstream outs;
 	outs <<L"Press Y to become Server" <<endl;
 	outs <<L"Press N to become Client" <<endl;
 	NetText = outs.str();
 	NoCon = 0;
 	LocalID=0;
+	UDP = true;
+	initRead = false;
 }
-
 SOCKETS::~SOCKETS(){
 	Clean();
 }
@@ -18,26 +20,9 @@ void SOCKETS::Clean(){
 	WSACleanup();
 	closesocket(s);
 }
-bool SOCKETS::GetInit(){
-	return Initialised;
-}
-void SOCKETS::ChangeText(std::wstring net){
-	std::wostringstream outs;
-	if(Initialised){
-		outs <<IPText;
-	}
-	outs << net;
-	NetText = outs.str();
-}
-void SOCKETS::RedrawText(){
-	std::wostringstream outs;
-	if(Initialised){
-		outs <<IPText;
-	}
-	NetText = outs.str();
-}
-std::wstring SOCKETS::GetText(){
-	return NetText;
+void SOCKETS::Error(HWND hwnd){
+	printf("Socket error\n");
+	MessageBox (hwnd,L"Socket Error",L"Information",MB_OK);
 }
 void SOCKETS::init(int type){
 	if(type==0){
@@ -62,38 +47,14 @@ void SOCKETS::init(int type){
 		}else{
 			printf("Socket Bound\n");
 		}
-		/*if(!Listening()){
-			printf("Error:  Unable to listen!\n");
-		}else{
-			printf("Listening for connections \n");
-		}*/
+		if(!UDP){
+			if(!Listening()){
+				printf("Error:  Unable to listen!\n");
+			}else{
+				printf("Listening for connections \n");
+			}
+		}
 	}
-}
-void SOCKETS::NumCon(){
-	printf("Listening for  a connections...\n");
-	printf("Number of current connection = %d\n\n", Connections);
-}
-void SOCKETS::SetAsync(HWND hwnd){
-	// Make socket asynchronous and hook to WM_SOCKET message
-	if(Server){
-		WSAAsyncSelect (s,hwnd,WM_SOCKET,(FD_CLOSE | FD_ACCEPT | FD_READ));
-	}else if(!Server){
-		WSAAsyncSelect (s,hwnd,WM_SOCKET,(FD_CLOSE | FD_CONNECT | FD_READ));
-	}
-	
-}
-void SOCKETS::SConnected(){
-	//if a valid connection is made to the server
-	//the  MSG_CONNECTED message will be recieved.
-	printf("Connected to server - got FD_CONNECT\n");
-	Connected = true;
-}
-void SOCKETS::Error(HWND hwnd){
-	printf("Socket error\n");
-	MessageBox (hwnd,L"Socket Error",L"Information",MB_OK);
-}
-SOCKET SOCKETS::GetSocket(){
-	return s;
 }
 int SOCKETS::StartWinSock(void){
 	// Startup Winsock
@@ -144,11 +105,10 @@ void SOCKETS::Create(){
 	}else if(!Server){
 		printf("The PORT being connected to is: ");
 		printf("%d\n\n", (int)PortNo);
+		SetDestinationAddress("127.0.0.1", PortNo);
 	}
 	IPText = outs.str();
-}
-bool SOCKETS::CheckType(){
-	return Server;
+	
 }
 bool SOCKETS::Bind(){
 	// Bind the listening socket
@@ -166,36 +126,43 @@ bool SOCKETS::Listening(){
 	}
 	return true;
 }
+void SOCKETS::NumCon(){
+	printf("Listening for  a connections...\n");
+	printf("Number of current connection = %d\n\n", Connections);
+}
+void SOCKETS::SetAsync(HWND hwnd){
+	// Make socket asynchronous and hook to WM_SOCKET message
+	if(Server){
+		WSAAsyncSelect (s,hwnd,WM_SOCKET,(FD_CLOSE | FD_ACCEPT | FD_READ));
+	}else if(!Server){
+		WSAAsyncSelect (s,hwnd,WM_SOCKET,(FD_CLOSE | FD_CONNECT | FD_READ));
+	}
+	
+}
+void SOCKETS::SConnected(){
+	//if a valid connection is made to the server
+	//the  MSG_CONNECTED message will be recieved.
+	printf("Connected to server - got FD_CONNECT\n");
+	Connected = true;
+}
 void SOCKETS::Accept(WPARAM wParam){
 	AcceptMsg = accept (wParam,&you,&sa_size);
 	printf("Client has connected!\n");
 	sprintf_s (MyPacket.Text, TEXTSIZE, "%c",MSG_CONNECTED); //A
 	printf ("The Following has been sent -> %c\n", MyPacket.Text[0]);
-	MyPacket.CID = ++NoCon;
-	MyPacket.PID++;
 	memcpy(Buffer, &MyPacket, sizeof(MyPackets));
 	SendMsg = send (wParam, Buffer, BUFFERSIZE, 0);
-}
-void SOCKETS::Read(WPARAM wParam){
-	RecvMsg = recv (wParam,Buffer, BUFFERSIZE, 0);
-	memcpy(&MyPacket, Buffer, sizeof(MyPackets));
-	LocalID = MyPacket.CID;
-	printf("Received Packet with ID -> %d\n", MyPacket.PID);
-	printf("From -> %d\n", MyPacket.CID);
-	if(Server){
-		memcpy(Buffer, &MyPacket, sizeof(MyPackets));
-		SendMsg = send (wParam,Buffer,BUFFERSIZE,0);
-	}
 }
 void SOCKETS::Connect(){
 	if(!Server){
 		if(!Connected){
 			int temp =connect(s,(LPSOCKADDR)&me,sa_size);
-			Connected = true;
 			if(temp<0){
 				printf("connect error\n");
+			}else{
+				Connected = true;
+				InitSend();
 			}
-			Send();
 		}else{
 			printf("Already connected to server\n");
 		}
@@ -209,19 +176,114 @@ void SOCKETS::Close(int type){
 	}
 	PostQuitMessage (0);
 }
+//send functions
 void SOCKETS::Send(){
+	CommonSend();
+	send (s, Buffer, BUFFERSIZE ,0);
+}
+void SOCKETS::Send(WPARAM wParam){
+	CommonSend();
+	send (wParam, Buffer, BUFFERSIZE ,0);
+}
+void SOCKETS::SendTo(){
+	CommonSend();
+	int n = sendto(s, Buffer, BUFFERSIZE, 0, (struct sockaddr *)&m_RemoteAddress, m_SocketAddressSize);
+}
+void SOCKETS::CommonSend(){
+	if(!Server){
+		MyPacket.CID = LocalID;
+	}
+	memcpy(Buffer, &MyPacket, sizeof(MyPackets));
+}
+void SOCKETS::InitSend(){
 	if(!Server){
 		if(Connected){
-			MyPacket.CID = LocalID;
-			memcpy(Buffer, &MyPacket, sizeof(MyPackets));
-			send (s, Buffer, BUFFERSIZE ,0);
+			sprintf(MyPacket.Text,"Initial Connect");
+			SendTo();
 		}else{
 			printf("Not connected to server yet!\n");
 		}
 	}
 }
-
-
+//read functions
+void SOCKETS::Read(){
+	RecvMsg = recv (s,Buffer, BUFFERSIZE, 0);
+	CommonRead();
+}
+void SOCKETS::Read(WPARAM wParam){
+	RecvMsg = recv (wParam,Buffer, BUFFERSIZE, 0);
+	s= wParam;
+	CommonRead();
+}
+void SOCKETS::ReadFrom(WPARAM wParam){
+	int n = recvfrom(wParam, Buffer, BUFFERSIZE, 0, (struct sockaddr *)&m_RemoteAddress, &m_SocketAddressSize);
+	CommonRead();
+}
+void SOCKETS::InitRead(){
+	if(Server){
+		if(!CheckList()){
+			MyPacket.CID = NoCon;
+			SendTo();
+		}
+	}else if(!Server && !initRead){
+		LocalID = MyPacket.CID;
+		initRead = true;
+	}
+}
+void SOCKETS::CommonRead(){
+	memcpy(&MyPacket, Buffer, sizeof(MyPackets));
+	InitRead();
+	printf("Received Packet with ID -> %d\n", MyPacket.PID);
+	printf("From -> %d\n", MyPacket.CID);
+}
+void SOCKETS::ChangeText(std::wstring net){
+	std::wostringstream outs;
+	if(Initialised){
+		outs <<IPText;
+	}
+	outs << net;
+	NetText = outs.str();
+}
+void SOCKETS::RedrawText(){
+	std::wostringstream outs;
+	if(Initialised){
+		outs <<IPText;
+		outs <<"ID:" << LocalID;
+	}
+	NetText = outs.str();
+}
+std::wstring SOCKETS::GetText(){
+	return NetText;
+}
+SOCKET SOCKETS::GetSocket(){
+	return s;
+}
+bool SOCKETS::CheckType(){
+	return Server;
+}
+void SOCKETS::SetDestinationAddress(char * IP, const int Port)
+{
+	m_RemoteAddress.sin_family = AF_INET;
+	m_RemoteAddress.sin_port = htons (Port);
+	m_RemoteAddress.sin_addr.s_addr = inet_addr (IP);
+}
+bool SOCKETS::GetInit(){
+	return Initialised;
+}
+bool SOCKETS::CheckList(){
+	for(it=SIDS.begin(); it!=SIDS.end(); it++){
+		if(!strcmp(inet_ntoa(it->sin_addr.sin_addr),inet_ntoa(m_RemoteAddress.sin_addr))){
+			if((ntohs(it->sin_addr.sin_port)==ntohs(m_RemoteAddress.sin_port))){			
+				return true;
+			}
+		}
+	}
+	SocketID temp;
+	temp.sin_addr= m_RemoteAddress;
+	temp.ID = ++NoCon;
+	SIDS.push_back(temp);
+	return false;
+}
 /*
 bool checklist(sockaddr_in temp1, char msg[PACKETSIZE]){
 	id temp;
@@ -240,8 +302,8 @@ bool checklist(sockaddr_in temp1, char msg[PACKETSIZE]){
 	printf("%s has joined.\n", temp.name);   
 	return false;
 }
-
-
+*/
+/*
 struct id{
 	struct sockaddr_in sin_addr;
 	char name[PACKETSIZE];

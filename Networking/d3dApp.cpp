@@ -381,12 +381,14 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		case VK_F1:
 			{
 				cout << "F1 keypress\n";
-				appSockets.Send();
+				appSockets.SendTo();
+				appSockets.RedrawText();
 				break;
 			}
 		case 'C':
 			{
 				appSockets.Connect();
+				appSockets.RedrawText();
 				break;
 			}
 		case 'P':
@@ -437,7 +439,7 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 					break;
 				}//end case FD_CONNECT
 			case FD_READ:{
-					appSockets.Read(wParam);
+					appSockets.ReadFrom(wParam);
 					break;
 				}//end case FD_READ
 
