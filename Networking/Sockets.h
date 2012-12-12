@@ -56,7 +56,7 @@ private:
 	int SendMsg;
 	int RecvMsg;
 	int NoCon;
-	int LocalID;
+	MyPackets LocalPacket;
 	struct sockaddr_in m_RemoteAddress;
 	std::wstring NetText;
 	std::wstring IPText;

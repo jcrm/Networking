@@ -13,78 +13,96 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\GfxObj Files">
+      <UniqueIdentifier>{cc7957f0-58f6-4c4c-ac1f-f709eafecdd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Network Files">
+      <UniqueIdentifier>{8950baec-c463-4de2-a637-ea61e74ee357}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common Files">
+      <UniqueIdentifier>{c943aca7-d865-46a5-8575-476642a592e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common Files">
+      <UniqueIdentifier>{2a5fc7d5-c99a-47cb-a8c7-0fb56b001432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network Files">
+      <UniqueIdentifier>{5007e0f4-12fc-401b-9a7b-b76b9b7ea73f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GfxObj Files">
+      <UniqueIdentifier>{fd0df072-acf0-4f45-ade3-6f786f873548}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="console.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="d3dUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="defines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GfxObj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Packet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sockets.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GfxObj Files</Filter>
     </ClInclude>
     <ClInclude Include="triangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GfxObj Files</Filter>
     </ClInclude>
     <ClInclude Include="sphere.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\GfxObj Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cube.h">
+      <Filter>Header Files\GfxObj Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Header Files\Network Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sockets.h">
+      <Filter>Header Files\Network Files</Filter>
+    </ClInclude>
+    <ClInclude Include="defines.h">
+      <Filter>Header Files\Network Files</Filter>
+    </ClInclude>
+    <ClInclude Include="console.h">
+      <Filter>Header Files\Network Files</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Common Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dUtil.h">
+      <Filter>Header Files\Common Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Header Files\Common Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files\Common Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="console.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="d3dApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Packet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sockets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="triangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NetworkApp.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files\Common Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTimer.cpp">
+      <Filter>Source Files\Common Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console.cpp">
+      <Filter>Source Files\Network Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sockets.cpp">
+      <Filter>Source Files\Network Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Source Files\Network Files</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle.cpp">
+      <Filter>Source Files\GfxObj Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>Source Files\GfxObj Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cube.cpp">
+      <Filter>Source Files\GfxObj Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

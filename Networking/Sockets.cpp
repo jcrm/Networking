@@ -9,7 +9,7 @@ SOCKETS::SOCKETS(){
 	outs <<L"Press N to become Client" <<endl;
 	NetText = outs.str();
 	NoCon = 0;
-	LocalID=0;
+	LocalPacket.CID=0;
 	UDP = true;
 	initRead = false;
 }
@@ -191,7 +191,9 @@ void SOCKETS::SendTo(){
 }
 void SOCKETS::CommonSend(){
 	if(!Server){
-		MyPacket.CID = LocalID;
+		MyPacket.CID = LocalPacket.CID;
+		MyPacket.PID = LocalPacket.PID++;
+		printf("Sent Packet with ID -> %d\n", MyPacket.PID);
 	}
 	memcpy(Buffer, &MyPacket, sizeof(MyPackets));
 }
@@ -226,7 +228,7 @@ void SOCKETS::InitRead(){
 			SendTo();
 		}
 	}else if(!Server && !initRead){
-		LocalID = MyPacket.CID;
+		LocalPacket.CID = MyPacket.CID;
 		initRead = true;
 	}
 }
@@ -248,7 +250,7 @@ void SOCKETS::RedrawText(){
 	std::wostringstream outs;
 	if(Initialised){
 		outs <<IPText;
-		outs <<"ID:" << LocalID;
+		outs <<"ID:" << LocalPacket.CID;
 	}
 	NetText = outs.str();
 }
