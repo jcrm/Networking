@@ -13,10 +13,12 @@ public:
 	~Speed();
 	void UpdateDir(D3DXVECTOR3 temp);
 	void UpdateDir(float dx,float dy,float dz);
+	void RandDir();
 
 private:
 	void CheckLimits();
 	float DirLimit;
+	int RandDirCount;
 };
 
 

@@ -168,7 +168,6 @@ void NetworkApp::updateScene(float dt){
 		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	
-	thisCube.Move();
 	// Update angles based on input to orbit camera around scene.
 	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
 	if(GetAsyncKeyState('D') & 0x8000)	thisCamera.MoveRight();
@@ -176,6 +175,9 @@ void NetworkApp::updateScene(float dt){
 	if(GetAsyncKeyState('S') & 0x8000)	thisCamera.MoveBack();
 	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
 	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
+
+	thisCube.Move();
+	thisSphere.Move();
 
 	D3DApp::updateScene(dt);
 
@@ -197,8 +199,8 @@ void NetworkApp::drawScene(){
 	// Don't transform texture coordinates, so just use identity transformation.
 	D3DXMATRIX texMtx;
 	D3DXMatrixIdentity(&texMtx);
-	//thisTriangle.draw(mView,mProj,mfxWVPVar,mTech);
-	//thatTriangle.draw(mView,mProj,mfxWVPVar,mTech);
+	//xthisTriangle.draw(mView,mProj,mfxWVPVar,mTech);
+	//xthatTriangle.draw(mView,mProj,mfxWVPVar,mTech);
 	thisCube.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 	thisSphere.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 

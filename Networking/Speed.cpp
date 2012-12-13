@@ -6,6 +6,7 @@ Speed::Speed(){
 	accel = 0.0f;
 	velo = 0.0005f;
 	DirLimit = 10;
+	RandDirCount = 0;
 }
 Speed::~Speed(){
 
@@ -36,4 +37,13 @@ void Speed::UpdateDir(float dx, float dy, float dz){
 	Dir.y+=dy;
 	Dir.z+=dz;
 	CheckLimits();
+}
+void Speed::RandDir(){
+	if(RandDirCount++ == 1000){
+		int temp = int(DirLimit);
+		Dir.x = (rand()%(2*temp))-temp;
+		Dir.y = (rand()%(2*temp))-temp;
+		Dir.z = (rand()%(2*temp))-temp;
+		RandDirCount =0;
+	}
 }

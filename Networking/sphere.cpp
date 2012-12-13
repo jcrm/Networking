@@ -56,6 +56,10 @@ void Sphere::DrawVertices()
 void Sphere::draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* mfxWVPVar,ID3D10EffectMatrixVariable* mfxWorldVar, ID3D10EffectTechnique* mTech){
 	GfxObj::draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 }
+void Sphere::Move(){
+	mySpeed.RandDir();
+	GfxObj::Move();
+}
 void Sphere::buildStacks(VertexList& vertices, IndexList& indices)
 {
 	float phiStep = PI/mNumStacks;
@@ -76,7 +80,7 @@ void Sphere::buildStacks(VertexList& vertices, IndexList& indices)
 
 			Vertex v;
 			v.colour = D3DXVECTOR4(RandF(),RandF(),RandF(),RandF());
-			// spherical to cartesian
+			// spherical to Cartesian
 			v.pos.x = mRadius*sinf(phi)*cosf(theta);
 			v.pos.y = mRadius*cosf(phi);
 			v.pos.z = mRadius*sinf(phi)*sinf(theta);
