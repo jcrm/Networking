@@ -36,9 +36,6 @@
     <ClInclude Include="d3dApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GfxObj.h">
-      <Filter>Header Files\GfxObj Files</Filter>
-    </ClInclude>
     <ClInclude Include="triangle.h">
       <Filter>Header Files\GfxObj Files</Filter>
     </ClInclude>
@@ -72,6 +69,12 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files\Common Files</Filter>
     </ClInclude>
+    <ClInclude Include="Speed.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GfxObj.h">
+      <Filter>Header Files\GfxObj Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="d3dApp.cpp">
@@ -102,6 +105,12 @@
       <Filter>Source Files\GfxObj Files</Filter>
     </ClCompile>
     <ClCompile Include="cube.cpp">
+      <Filter>Source Files\GfxObj Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Speed.cpp">
+      <Filter>Source Files\Common Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GfxObj.cpp">
       <Filter>Source Files\GfxObj Files</Filter>
     </ClCompile>
   </ItemGroup>

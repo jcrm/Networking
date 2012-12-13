@@ -21,6 +21,7 @@
     <ClInclude Include="GfxObj.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Sockets.h" />
+    <ClInclude Include="Speed.h" />
     <ClInclude Include="sphere.h" />
     <ClInclude Include="triangle.h" />
     <ClInclude Include="Vertex.h" />
@@ -31,8 +32,10 @@
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="d3dApp.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="GfxObj.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Sockets.cpp" />
+    <ClCompile Include="Speed.cpp" />
     <ClCompile Include="sphere.cpp" />
     <ClCompile Include="NetworkApp.cpp" />
     <ClCompile Include="triangle.cpp" />

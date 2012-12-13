@@ -47,7 +47,7 @@ public:
 	void UpdatePacket(D3DXVECTOR3 temp);
 	void UpdatePacket(float x, float y, float z);
 	bool CheckList();
-
+	bool Connected;
 private:
 	bool UDP;
 	SOCKET s;
@@ -69,7 +69,7 @@ private:
 	std::list<SocketID>::iterator it;
 
 	char Buffer[BUFFERSIZE];
-	bool Connected;
+	
 	bool Server;
 	bool Initialised;
 	int StartWinSock(void);

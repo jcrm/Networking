@@ -123,7 +123,7 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 					appSockets.ReadFrom(wParam);
 					if(appSockets.CheckType()){
 						MyPackets temp = appSockets.MyPacket;
-						thisCube.Translate(temp.pos.x, temp.pos.y, temp.pos.z);
+						thisCube.TranslateTo(temp.pos.x, temp.pos.y, temp.pos.z);
 					}
 					break;
 				}//end case FD_READ
@@ -174,23 +174,46 @@ void NetworkApp::updateScene(float dt)
 			appSockets.RedrawText();
 		}
 	}
-				
+	Speed tSpeed;			
+	tSpeed= thisCube.GetSpeed();
 	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
-		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()-0.001,thisCube.GetPosZ());
-		appSockets.UpdatePacket(thisCube.pos);
+		tSpeed.UpdateDir(0,-0.1,0);
+		thisCube.ChangeSpeed(tSpeed);
+		//thisCube.Translate(0,-0.001,0);
+		appSockets.UpdatePacket(thisCube.GetPos());
 	}
 	if(GetAsyncKeyState(VK_UP) & 0x8000){
-		thisCube.Translate(thisCube.GetPosX(),thisCube.GetPosY()+0.001,thisCube.GetPosZ());
-		appSockets.UpdatePacket(thisCube.pos);
+		tSpeed.UpdateDir(0,0.1,0);
+		thisCube.ChangeSpeed(tSpeed);
+		//thisCube.Translate(0,0.001,0);
+		appSockets.UpdatePacket(thisCube.GetPos());
 	}
 	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
-		thisCube.Translate(thisCube.GetPosX()-0.001,thisCube.GetPosY(),thisCube.GetPosZ());
-		appSockets.UpdatePacket(thisCube.pos);
+		tSpeed.UpdateDir(-0.1,0,0);
+		thisCube.ChangeSpeed(tSpeed);
+		//thisCube.Translate(-0.001,0,0);
+		appSockets.UpdatePacket(thisCube.GetPos());
 	}
 	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
-		thisCube.Translate(thisCube.GetPosX()+0.001,thisCube.GetPosY(),thisCube.GetPosZ());
-		appSockets.UpdatePacket(thisCube.pos);
+		tSpeed.UpdateDir(0.1,0,0);
+		thisCube.ChangeSpeed(tSpeed);
+		//thisCube.Translate(0.001,0,0);
+		appSockets.UpdatePacket(thisCube.GetPos());
 	}
+	if(GetAsyncKeyState('Q') & 0x8000){
+		tSpeed.UpdateDir(0,0,0.1);
+		thisCube.ChangeSpeed(tSpeed);
+		//thisCube.Translate(0,0,-0.001);
+		appSockets.UpdatePacket(thisCube.GetPos());
+	}
+	if(GetAsyncKeyState('E') & 0x8000){
+		tSpeed.UpdateDir(0,0,-0.1);
+		thisCube.ChangeSpeed(tSpeed);
+		//thisCube.Translate(0,0,0.001);
+		appSockets.UpdatePacket(thisCube.GetPos());
+	}
+	
+	thisCube.Move();
 	// Update angles based on input to orbit camera around scene.
 	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
 	if(GetAsyncKeyState('D') & 0x8000)	thisCamera.MoveRight();
