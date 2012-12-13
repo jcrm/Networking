@@ -175,7 +175,7 @@ void D3DApp::updateScene(float dt){
 		frameCnt = 0;
 		t_base  += 1.0f;
 	}	
-	if(frameCnt%50==0){
+	if(frameCnt%500==0){
 		if(!appSockets.CheckType()&& appSockets.Connected){
 			appSockets.SendTo();
 		}

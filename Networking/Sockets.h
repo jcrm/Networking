@@ -13,6 +13,7 @@ struct SocketID{
 
 class SOCKETS{
 public:
+
 	SOCKETS();
 	~SOCKETS();
 	void init(int type);
@@ -42,19 +43,23 @@ public:
 	void RedrawText();
 	std::wstring GetText();
 	SOCKET GetSocket();
-	MyPackets MyPacket;
 	void SetDestinationAddress(char * IP, const int Port);
 	void SendAll();
 	void UpdatePacket(D3DXVECTOR3 temp, Speed tempSpeed);
 	void UpdatePacket(float x, float y, float z, Speed tempSpeed);
+	int GetLocalID();
 	bool CheckList();
+	bool GetNewConnection();
+
+	MyPackets MyPacket;
 	bool Connected;
+	bool initRead;
 private:
 	bool UDP;
+	bool NewConnection;
 	SOCKET s;
 	sockaddr_in me;
 	sockaddr you;
-	bool initRead;
 	int sa_size;
 	int Connections;
 	int AcceptMsg;

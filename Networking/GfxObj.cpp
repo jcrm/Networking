@@ -8,8 +8,6 @@ theta(0,0,0), indexed(true){
 }
 
 GfxObj::~GfxObj(){
-	ReleaseCOM(mVB);
-	ReleaseCOM(mIB);
 }
 D3DXVECTOR3 GfxObj::GetPos(){
 	return pos;

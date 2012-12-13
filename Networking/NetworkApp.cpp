@@ -6,6 +6,7 @@
 #include "d3dApp.h"
 #include "Vertex.h"
 #include "NetworkApp.h"
+#include "PlayerList.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -39,6 +40,7 @@ NetworkApp::~NetworkApp(){
 
 void NetworkApp::initApp(){
 	D3DApp::initApp();
+	PList.Init(md3dDevice);
 	thisTriangle.init(md3dDevice);
 	thatTriangle.init(md3dDevice);
 	thisCube.init(md3dDevice);
@@ -77,9 +79,19 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 			case FD_READ:{
 					appSockets.ReadFrom(wParam);
 					if(appSockets.CheckType()){
-						MyPackets temp = appSockets.MyPacket;
-						thisCube.TranslateTo(temp.pos.x, temp.pos.y, temp.pos.z);
-						thisCube.ChangeSpeed(temp.PacketSpeed);
+						if(appSockets.GetNewConnection()){
+							PList.AddToList(appSockets.MyPacket);
+						}else{
+							PList.UpdateList(appSockets.MyPacket);
+						}
+					}else{
+						if(appSockets.GetLocalID()==appSockets.MyPacket.CID && !appSockets.initRead){
+							appSockets.initRead = true;
+							PList.SetLocalID(appSockets.GetLocalID());
+							PList.AddToList(appSockets.MyPacket);
+						}else{
+							PList.UpdateList(appSockets.MyPacket);
+						}
 					}
 					break;
 				}//end case FD_READ
@@ -134,40 +146,32 @@ void NetworkApp::updateScene(float dt){
 	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
 		tSpeed.UpdateDir(0,-0.1,0);
 		thisCube.ChangeSpeed(tSpeed);
-		//thisCube.Translate(0,-0.001,0);
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState(VK_UP) & 0x8000){
 		tSpeed.UpdateDir(0,0.1,0);
 		thisCube.ChangeSpeed(tSpeed);
-		//thisCube.Translate(0,0.001,0);
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
 		tSpeed.UpdateDir(-0.1,0,0);
 		thisCube.ChangeSpeed(tSpeed);
-		//thisCube.Translate(-0.001,0,0);
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
 		tSpeed.UpdateDir(0.1,0,0);
 		thisCube.ChangeSpeed(tSpeed);
-		//thisCube.Translate(0.001,0,0);
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState('Q') & 0x8000){
 		tSpeed.UpdateDir(0,0,0.1);
 		thisCube.ChangeSpeed(tSpeed);
-		//thisCube.Translate(0,0,-0.001);
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState('E') & 0x8000){
 		tSpeed.UpdateDir(0,0,-0.1);
 		thisCube.ChangeSpeed(tSpeed);
-		//thisCube.Translate(0,0,0.001);
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
-	
+	if(GetAsyncKeyState('M') & 0x8000){
+		D3DXVECTOR3 temp(0,0,0);
+		tSpeed.UpdateDir(temp);
+		thisCube.ChangeSpeed(tSpeed);
+	}	
 	// Update angles based on input to orbit camera around scene.
 	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
 	if(GetAsyncKeyState('D') & 0x8000)	thisCamera.MoveRight();
@@ -176,8 +180,11 @@ void NetworkApp::updateScene(float dt){
 	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
 	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
 
-	thisCube.Move();
 	thisSphere.Move();
+	if(PList.Move(thisCube)){
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
+	}
+	
 
 	D3DApp::updateScene(dt);
 
@@ -201,8 +208,12 @@ void NetworkApp::drawScene(){
 	D3DXMatrixIdentity(&texMtx);
 	//xthisTriangle.draw(mView,mProj,mfxWVPVar,mTech);
 	//xthatTriangle.draw(mView,mProj,mfxWVPVar,mTech);
-	thisCube.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
+	//xthisCube.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 	thisSphere.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
+
+
+	PList.Draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
+
 
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
 	RECT R = {5, 5, 0, 0};
@@ -245,4 +256,3 @@ void NetworkApp::buildVertexLayouts(){
     HR(md3dDevice->CreateInputLayout(vertexDesc, 2, PassDesc.pIAInputSignature,
 		PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
- 

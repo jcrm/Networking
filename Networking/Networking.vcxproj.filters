@@ -84,6 +84,9 @@
     <ClInclude Include="d3dApp.h">
       <Filter>Header Files\App Files</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerList.h">
+      <Filter>Header Files\Common Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -121,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="d3dApp.cpp">
       <Filter>Source Files\App Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerList.cpp">
+      <Filter>Source Files\Common Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

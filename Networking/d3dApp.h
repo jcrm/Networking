@@ -19,10 +19,10 @@
 #include "GameTimer.h"
 #include "camera.h"
 #include "sphere.h"
+#include "PlayerList.h"
 
 
-typedef struct Mouse
-{
+typedef struct Mouse{
 	int x,y;
 }Mouse;
 
@@ -63,10 +63,13 @@ protected:
 	bool      mResizing;
 
 	GameTimer	mTimer;
+
+	PlayerList PList;
+
 	Triangle	thisTriangle;
 	Triangle	thatTriangle;
-	std::list<Cube> CubeList;
 	Cube		thisCube;
+
 	Sphere		thisSphere;
 	Camera		thisCamera;
 	SOCKETS		appSockets;

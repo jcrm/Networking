@@ -12,9 +12,13 @@ SOCKETS::SOCKETS(){
 	LocalPacket.CID=0;
 	UDP = true;
 	initRead = false;
+	NewConnection = true;
 }
 SOCKETS::~SOCKETS(){
 	Clean();
+}
+bool SOCKETS::GetNewConnection(){
+	return NewConnection;
 }
 void SOCKETS::Clean(){
 	WSACleanup();
@@ -23,6 +27,9 @@ void SOCKETS::Clean(){
 void SOCKETS::Error(HWND hwnd){
 	printf("Socket error\n");
 	MessageBox (hwnd,L"Socket Error",L"Information",MB_OK);
+}
+int SOCKETS::GetLocalID(){
+	return LocalPacket.CID;
 }
 void SOCKETS::init(int type){
 	if(type==0){
@@ -240,7 +247,6 @@ void SOCKETS::InitRead(){
 		}
 	}else if(!Server && !initRead){
 		LocalPacket.CID = MyPacket.CID;
-		initRead = true;
 	}
 }
 void SOCKETS::CommonRead(){
@@ -287,11 +293,13 @@ bool SOCKETS::GetInit(){
 bool SOCKETS::CheckList(){
 	for(it=SIDS.begin(); it!=SIDS.end(); it++){
 		if(!strcmp(inet_ntoa(it->sin_addr.sin_addr),inet_ntoa(m_RemoteAddress.sin_addr))){
-			if((ntohs(it->sin_addr.sin_port)==ntohs(m_RemoteAddress.sin_port))){			
+			if((ntohs(it->sin_addr.sin_port)==ntohs(m_RemoteAddress.sin_port))){	
+				NewConnection = false;
 				return true;
 			}
 		}
 	}
+	NewConnection = true;
 	SocketID temp;
 	temp.sin_addr= m_RemoteAddress;
 	temp.ID = ++NoCon;
