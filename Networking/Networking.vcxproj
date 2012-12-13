@@ -19,6 +19,7 @@
     <ClInclude Include="defines.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="GfxObj.h" />
+    <ClInclude Include="NetworkApp.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Sockets.h" />
     <ClInclude Include="Speed.h" />

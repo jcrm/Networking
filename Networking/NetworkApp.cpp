@@ -1,40 +1,11 @@
-//!=============================================================================!//
-//! Network App based on Triangle App.cpp based on Frank Lunas Coloured Cube App!//
-//!																				!//
-//!=============================================================================!//
+//==================================================================================//
+//	Network App based on Triangle App.cpp based on Frank Lunas Coloured Cube App	//
+//																					//
+//==================================================================================//
 
 #include "d3dApp.h"
 #include "Vertex.h"
-
-class NetworkApp : public D3DApp{
-public:
-	NetworkApp(HINSTANCE hInstance);
-	~NetworkApp();
-	ID3D10Buffer* mVB;
-	ID3D10Buffer* mIB;
-	int scale;
-	LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam);
-	void initApp();
-	void onResize();
-	void updateScene(float dt);
-	void drawScene(); 
-
-private:
-	void buildFX();
-	void buildVertexLayouts();
- 
-private:	
-
-	ID3D10Effect* mFX;
-	ID3D10EffectTechnique* mTech;
-	ID3D10InputLayout* mVertexLayout;
-	ID3D10EffectMatrixVariable* mfxWVPVar;
-
-	D3DXMATRIX mView;
-	D3DXMATRIX mProj;
-	D3DXMATRIX mWVP;
-
-};
+#include "NetworkApp.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
@@ -44,9 +15,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 	_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
-
 	NetworkApp theApp(hInstance);
-
 
 	theApp.initApp();
 
@@ -58,7 +27,6 @@ NetworkApp::NetworkApp(HINSTANCE hInstance)
 {
 	D3DXMatrixIdentity(&mView);
 	D3DXMatrixIdentity(&mProj);
-	D3DXMatrixIdentity(&mWVP); 
 }
 
 NetworkApp::~NetworkApp(){
