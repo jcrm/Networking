@@ -3,6 +3,7 @@
 
 #include "d3dUtil.h"
 #include "Packet.h"
+#include "Speed.h"
 #include <list>
 
 struct SocketID{
@@ -44,8 +45,8 @@ public:
 	MyPackets MyPacket;
 	void SetDestinationAddress(char * IP, const int Port);
 	void SendAll();
-	void UpdatePacket(D3DXVECTOR3 temp);
-	void UpdatePacket(float x, float y, float z);
+	void UpdatePacket(D3DXVECTOR3 temp, Speed tempSpeed);
+	void UpdatePacket(float x, float y, float z, Speed tempSpeed);
 	bool CheckList();
 	bool Connected;
 private:

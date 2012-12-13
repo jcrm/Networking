@@ -57,7 +57,7 @@ void SOCKETS::init(int type){
 	}
 }
 int SOCKETS::StartWinSock(void){
-	// Startup Winsock
+	// Start-up Winsock
 	WSADATA w;
 	int error = WSAStartup (0x0202,&w);
 	if (error){
@@ -141,7 +141,7 @@ void SOCKETS::SetAsync(HWND hwnd){
 }
 void SOCKETS::SConnected(){
 	//if a valid connection is made to the server
-	//the  MSG_CONNECTED message will be recieved.
+	//the  MSG_CONNECTED message will be received.
 	printf("Connected to server - got FD_CONNECT\n");
 	Connected = true;
 }
@@ -203,6 +203,7 @@ void SOCKETS::CommonSend(){
 		MyPacket.CID = LocalPacket.CID;
 		MyPacket.PID = LocalPacket.PID++;
 		MyPacket.pos = LocalPacket.pos;
+		MyPacket.PacketSpeed= LocalPacket.PacketSpeed;
 		printf("Sent Packet with ID -> %d\n", MyPacket.PID);
 	}
 	memcpy(Buffer, &MyPacket, sizeof(MyPackets));
@@ -297,13 +298,15 @@ bool SOCKETS::CheckList(){
 	SIDS.push_back(temp);
 	return false;
 }
-void SOCKETS::UpdatePacket(D3DXVECTOR3 temp){
-	LocalPacket.pos=temp;
+void SOCKETS::UpdatePacket(D3DXVECTOR3 tempPos, Speed tempSpeed){
+	LocalPacket.pos=tempPos;
+	LocalPacket.PacketSpeed = tempSpeed;
 }
-void SOCKETS::UpdatePacket(float x, float y, float z){
+void SOCKETS::UpdatePacket(float x, float y, float z, Speed tempSpeed){
 	LocalPacket.pos.x+=x;
 	LocalPacket.pos.y+=y;
 	LocalPacket.pos.z+=z;
+	LocalPacket.PacketSpeed = tempSpeed;
 }
 
 /*

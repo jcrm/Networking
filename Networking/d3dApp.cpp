@@ -202,7 +202,7 @@ void D3DApp::updateScene(float dt)
 		std::wostringstream outs;   
 		outs.precision(4);
 		outs << L"FPS: " << fps << L"\n" 
-			 << "Milliseconds: Per Frame: " << mspf;
+			 << L"Milliseconds: Per Frame: " << mspf;
 		mFrameStats = outs.str();
 		
 		// Reset for next average.
@@ -210,7 +210,7 @@ void D3DApp::updateScene(float dt)
 		t_base  += 1.0f;
 	}	
 	if(frameCnt%50==0){
-		if(!appSockets.CheckType()&&appSockets.Connected){
+		if(!appSockets.CheckType()&& appSockets.Connected){
 			appSockets.SendTo();
 		}
 		/*

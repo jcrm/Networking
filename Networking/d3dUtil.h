@@ -44,7 +44,7 @@ using namespace std;
 //the port of the server to connect to
 #define SERVERPORT 5555
 
-#define BUFFERSIZE		(100)
+#define BUFFERSIZE		(300)
 #define MSG_CONNECTED	(0x41)	//A
 #define TEXTSIZE		80
 #define NUMCONN			(4)
@@ -85,7 +85,7 @@ using namespace std;
 // Convenience functions.
 //*****************************************************************************
 
-// Converts ARGB 32-bit color format to ABGR 32-bit color format.
+// Converts ARGB 32-bit colour format to ABGR 32-bit colour format.
 D3DX10INLINE UINT ARGB2ABGR(UINT argb)
 {
 	BYTE A = (argb >> 24) & 0xff;

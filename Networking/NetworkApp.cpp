@@ -1,7 +1,7 @@
 //=============================================================================
-// Triangle App.cpp based on Frank Lunas Colored Cube App
+// Triangle App.cpp based on Frank Lunas Coloured Cube App
 //
-// Demonstrates coloring.
+// Demonstrates colouring.
 //
 // Controls:
 //		'A'/'D'/'W'/'S' - Rotate 
@@ -124,6 +124,7 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 					if(appSockets.CheckType()){
 						MyPackets temp = appSockets.MyPacket;
 						thisCube.TranslateTo(temp.pos.x, temp.pos.y, temp.pos.z);
+						thisCube.ChangeSpeed(temp.PacketSpeed);
 					}
 					break;
 				}//end case FD_READ
@@ -142,9 +143,9 @@ void NetworkApp::updateScene(float dt)
 		//system("pause");
 		PostQuitMessage(0);
 	}else if(GetAsyncKeyState(VK_F1)& 0x8000){
-		cout << "F1 keypress\n";
 		appSockets.SendTo();
 		appSockets.RedrawText();
+		cout << "F1 keypress\n";
 	}
 	if(GetAsyncKeyState('C')& 0x8000){
 		appSockets.Connect();
@@ -180,37 +181,37 @@ void NetworkApp::updateScene(float dt)
 		tSpeed.UpdateDir(0,-0.1,0);
 		thisCube.ChangeSpeed(tSpeed);
 		//thisCube.Translate(0,-0.001,0);
-		appSockets.UpdatePacket(thisCube.GetPos());
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState(VK_UP) & 0x8000){
 		tSpeed.UpdateDir(0,0.1,0);
 		thisCube.ChangeSpeed(tSpeed);
 		//thisCube.Translate(0,0.001,0);
-		appSockets.UpdatePacket(thisCube.GetPos());
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
 		tSpeed.UpdateDir(-0.1,0,0);
 		thisCube.ChangeSpeed(tSpeed);
 		//thisCube.Translate(-0.001,0,0);
-		appSockets.UpdatePacket(thisCube.GetPos());
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
 		tSpeed.UpdateDir(0.1,0,0);
 		thisCube.ChangeSpeed(tSpeed);
 		//thisCube.Translate(0.001,0,0);
-		appSockets.UpdatePacket(thisCube.GetPos());
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState('Q') & 0x8000){
 		tSpeed.UpdateDir(0,0,0.1);
 		thisCube.ChangeSpeed(tSpeed);
 		//thisCube.Translate(0,0,-0.001);
-		appSockets.UpdatePacket(thisCube.GetPos());
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	if(GetAsyncKeyState('E') & 0x8000){
 		tSpeed.UpdateDir(0,0,-0.1);
 		thisCube.ChangeSpeed(tSpeed);
 		//thisCube.Translate(0,0,0.001);
-		appSockets.UpdatePacket(thisCube.GetPos());
+		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
 	}
 	
 	thisCube.Move();
