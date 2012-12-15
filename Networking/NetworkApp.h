@@ -13,11 +13,14 @@ public:
 	void onResize();
 	void updateScene(float dt);
 	void drawScene(); 
-	void LocalRead();
 private:
 	void buildFX();
 	void buildVertexLayouts();
  
+	void LocalRead();
+	void CameraKeyPresses();
+	void ObjectKeyPresses();
+	void NetworkKeyPresses();
 private:	
 
 	ID3D10Effect* mFX;

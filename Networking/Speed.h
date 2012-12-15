@@ -6,9 +6,10 @@
 
 class Speed{
 public:
-	D3DXVECTOR3 Dir;
-	float velo;
-	float accel;
+	D3DXVECTOR3 mDir;
+	float mVelo;
+	float mAccel;
+
 	Speed();
 	~Speed();
 	void UpdateDir(D3DXVECTOR3 temp);
@@ -17,8 +18,9 @@ public:
 
 private:
 	void CheckLimits();
-	float DirLimit;
-	int RandDirCount;
+
+	float mDirLimit;
+	int mRandDirCount;
 };
 
 

@@ -26,6 +26,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 NetworkApp::NetworkApp(HINSTANCE hInstance)
 : D3DApp(hInstance),mFX(0), mTech(0), mfxWVPVar(0), mVertexLayout(0)
 {
+	mMainWndCaption = L"1000424 Network Application";
+	md3dDriverType  = D3D10_DRIVER_TYPE_HARDWARE;
+	mClearColor     = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
+	mClientWidth    = 800;
+	mClientHeight   = 600;
 	D3DXMatrixIdentity(&mView);
 	D3DXMatrixIdentity(&mProj);
 }
@@ -40,14 +45,13 @@ NetworkApp::~NetworkApp(){
 
 void NetworkApp::initApp(){
 	D3DApp::initApp();
-	PList.Init(md3dDevice);
-	thisTriangle.init(md3dDevice);
-	thatTriangle.init(md3dDevice);
-	thisCube.init(md3dDevice);
-	thisSphere.init(md3dDevice,(3.142/5),10,10);
-	thisSphere.Translate(5.0f,0.0f,0.0f);
-	mClearColor = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
-
+	//initialise list 
+	mPList.Init(md3dDevice);
+	//initialise temp cube
+	mCube.init(md3dDevice);
+	mSphere.init(md3dDevice,(3.142/5),10,10);
+	mSphere.Translate(5.0f,0.0f,0.0f);
+	
 	buildFX();
 	buildVertexLayouts();
 }
@@ -63,120 +67,46 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 	switch(msg){
 	case WM_SOCKET:
 		if (WSAGETSELECTERROR(lParam)){
-			appSockets.Error(mhMainWnd);
+			mAppSockets.Error(mhMainWnd);
 			PostQuitMessage (0);
 			return 0;
 		}
 		switch (WSAGETSELECTEVENT(lParam)){
-			case FD_ACCEPT:{
-					appSockets.Accept(wParam);
-					break;
-				}//end case FD_ACCePT
-			case FD_CONNECT:{
-					appSockets.SConnected();
-					break;
-				}//end case FD_CONNECT
-			case FD_READ:{
-					appSockets.ReadFrom(wParam);
-					LocalRead();
-					break;
-				}//end case FD_READ
-			case FD_CLOSE:{
-					appSockets.Close(0);
-					break;
-				}//end case FD_CLOSE
+		case FD_ACCEPT:
+			mAppSockets.Accept(wParam);
+			break;	//end case FD_ACCEPT
+		case FD_CONNECT:
+			mAppSockets.SConnected();
+			break;//end case FD_CONNECT
+		case FD_READ:
+			mAppSockets.ReadFrom(wParam);
+			LocalRead();
+			break;//end case FD_READ
+		case FD_CLOSE:
+			mAppSockets.Close();
+			break;//end case FD_CLOSE
 		}
 	}
 	return D3DApp::msgProc(msg, wParam, lParam);
 }
 void NetworkApp::updateScene(float dt){
+	static int packetCount = 0;
 
-	if(GetAsyncKeyState(VK_ESCAPE)& 0x8000){
-		//system("pause");
-		PostQuitMessage(0);
-	}else if(GetAsyncKeyState(VK_F1)& 0x8000){
-		appSockets.SendTo();
-		appSockets.RedrawText();
-		cout << "F1 keypress\n";
-	}
-	if(GetAsyncKeyState('C')& 0x8000){
-		appSockets.Connect();
-		appSockets.RedrawText();
-	}
-	if(GetAsyncKeyState('P')& 0x8000){
-		ShowWin32Console();
-	}
-	if(GetAsyncKeyState('T')& 0x8000){
-		cout << "T keypress\n";
-		appSockets.SendAll();
-		appSockets.RedrawText();
-	}
-	if(GetAsyncKeyState('Y')& 0x8000){
-		if(!appSockets.GetInit()){
-			cout << "create server";
-			appSockets.init(0);
-			appSockets.SetAsync(mhMainWnd);
-			appSockets.RedrawText();
-			PList.AddToList(appSockets.MyPacket);
-		}
-	}
-	if(GetAsyncKeyState('N')& 0x8000){
-		if(!appSockets.GetInit()){
-			cout << "create client";
-			appSockets.init(1);
-			appSockets.SetAsync(mhMainWnd);
-			appSockets.RedrawText();
-		}
-	}
-	Speed tSpeed;			
-	tSpeed= thisCube.GetSpeed();
-	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
-		tSpeed.UpdateDir(0,-0.1,0);
-		thisCube.ChangeSpeed(tSpeed);
-	}
-	if(GetAsyncKeyState(VK_UP) & 0x8000){
-		tSpeed.UpdateDir(0,0.1,0);
-		thisCube.ChangeSpeed(tSpeed);
-	}
-	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
-		tSpeed.UpdateDir(-0.1,0,0);
-		thisCube.ChangeSpeed(tSpeed);
-	}
-	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
-		tSpeed.UpdateDir(0.1,0,0);
-		thisCube.ChangeSpeed(tSpeed);
-	}
-	if(GetAsyncKeyState('Q') & 0x8000){
-		tSpeed.UpdateDir(0,0,0.1);
-		thisCube.ChangeSpeed(tSpeed);
-	}
-	if(GetAsyncKeyState('E') & 0x8000){
-		tSpeed.UpdateDir(0,0,-0.1);
-		thisCube.ChangeSpeed(tSpeed);
-	}
-	if(GetAsyncKeyState('M') & 0x8000){
-		D3DXVECTOR3 temp(0,0,0);
-		tSpeed.UpdateDir(temp);
-		thisCube.ChangeSpeed(tSpeed);
-	}	
-	// Update angles based on input to orbit camera around scene.
-	if(GetAsyncKeyState('A') & 0x8000)	thisCamera.MoveLeft();
-	if(GetAsyncKeyState('D') & 0x8000)	thisCamera.MoveRight();
-	if(GetAsyncKeyState('W') & 0x8000)	thisCamera.MoveForward();
-	if(GetAsyncKeyState('S') & 0x8000)	thisCamera.MoveBack();
-	if(GetAsyncKeyState('Z') & 0x8000)	thisCamera.MoveUp();
-	if(GetAsyncKeyState('X') & 0x8000)	thisCamera.MoveDown();
-
-	thisSphere.Move();
-	if(PList.Move(thisCube)){
-		appSockets.UpdatePacket(thisCube.GetPos(), thisCube.GetSpeed());
-	}
+	NetworkKeyPresses();
+	ObjectKeyPresses();
+	CameraKeyPresses();
 	
-
+	if((packetCount++)%500==0){
+		if(!mAppSockets.GetServer()&& mAppSockets.GetConnected()){
+			mAppSockets.SendTo();
+		}else if(mAppSockets.GetServer()){
+			mAppSockets.SendServer();
+		}
+	}
 	D3DApp::updateScene(dt);
 
-	thisCamera.Update();
-	thisCamera.Look(mView);
+	mCamera.Update();
+	mCamera.Look(mView);
 }
 
 void NetworkApp::drawScene(){
@@ -193,21 +123,16 @@ void NetworkApp::drawScene(){
 	// Don't transform texture coordinates, so just use identity transformation.
 	D3DXMATRIX texMtx;
 	D3DXMatrixIdentity(&texMtx);
-	//xthisTriangle.draw(mView,mProj,mfxWVPVar,mTech);
-	//xthatTriangle.draw(mView,mProj,mfxWVPVar,mTech);
-	//xthisCube.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
-	thisSphere.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 
-
-	PList.Draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
-
+	mPList.Draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
+	mSphere.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
 	RECT R = {5, 5, 0, 0};
 	md3dDevice->RSSetState(0);
 	mFont->DrawText(0, mFrameStats.c_str(), -1, &R, DT_NOCLIP, BLACK);
 	RECT NR = {5, mClientHeight-75,0,0};
-	mFont->DrawText(0, appSockets.GetText().c_str(), -1, &NR, DT_NOCLIP, BLACK);
+	mFont->DrawText(0, mAppSockets.GetText().c_str(), -1, &NR, DT_NOCLIP, BLACK);
 	
 	mSwapChain->Present(0, 0);
 }
@@ -244,24 +169,118 @@ void NetworkApp::buildVertexLayouts(){
 		PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
 void NetworkApp::LocalRead(){
-	if(appSockets.CheckType()){
-		if(appSockets.GetNewConnection()){
-			PList.AddToList(appSockets.MyPacket);
-		}else if(appSockets.MyPacket.ReadyToRecv){
-			appSockets.SendAllCubes(PList.GetList(),PList.GetIterator());
+	if(mAppSockets.GetServer()){
+		if(mAppSockets.GetNewConnection()){
+			mPList.AddToList(mAppSockets.GetTempPacket());
+		}else if(mAppSockets.GetTempPacket().ReadyToRecv){
+			mAppSockets.SendAllCubes(mPList.GetList(),mPList.GetIterator());
 		}else{
-			PList.UpdateList(appSockets.MyPacket);
-			appSockets.SendAll(appSockets.MyPacket.CID);
+			mPList.UpdateList(mAppSockets.GetTempPacket());
+			mAppSockets.SendAll(mAppSockets.GetTempPacket().CID);
 		}
 	}else{
-		if(appSockets.GetLocalID()==appSockets.MyPacket.CID && !appSockets.initRead){
-			appSockets.initRead = true;
-			PList.SetLocalID(appSockets.GetLocalID());
-			PList.AddToList(appSockets.MyPacket);
-		}else if(PList.CheckList(appSockets.MyPacket.CID)){
-			PList.UpdateList(appSockets.MyPacket);
-		}else if(!PList.CheckList(appSockets.MyPacket.CID)){
-			PList.AddToList(appSockets.MyPacket);
+		if(mAppSockets.GetLocalID()==mAppSockets.GetTempPacket().CID && !mAppSockets.GetInitRead()){
+			mAppSockets.SetInitRead(true);
+			mPList.SetLocalID(mAppSockets.GetLocalID());
+			mPList.AddToList(mAppSockets.GetTempPacket());
+		}else if(mPList.CheckList(mAppSockets.GetTempPacket().CID)){
+			mPList.UpdateList(mAppSockets.GetTempPacket());
+		}else if(!mPList.CheckList(mAppSockets.GetTempPacket().CID)){
+			mPList.AddToList(mAppSockets.GetTempPacket());
 		}
 	}
+}
+void NetworkApp::NetworkKeyPresses(){
+	if(GetAsyncKeyState(VK_ESCAPE)& 0x8000){
+		PostQuitMessage(0);
+	}else if(GetAsyncKeyState(VK_F1)& 0x8000){
+		mAppSockets.SendTo();
+		mAppSockets.RedrawText();
+	}else if(GetAsyncKeyState('C')& 0x8000){
+		mAppSockets.Connect();
+		mAppSockets.RedrawText();
+	}else if(GetAsyncKeyState('P')& 0x8000){
+		ShowWin32Console();
+	}else if(GetAsyncKeyState('T')& 0x8000){
+		mAppSockets.SendAll();
+		mAppSockets.RedrawText();
+	}else if(GetAsyncKeyState('Y')& 0x8000){
+		if(!mAppSockets.GetInitialised()){
+			cout << "create server\n";
+			mAppSockets.Init(0);
+			mAppSockets.SetAsync(mhMainWnd);
+			mAppSockets.RedrawText();
+	
+			mPList.AddToList(mAppSockets.GetTempPacket());
+		}
+	}else if(GetAsyncKeyState('N')& 0x8000){
+		if(!mAppSockets.GetInitialised()){
+			cout << "create client\n";
+			mAppSockets.Init(1);
+			mAppSockets.SetAsync(mhMainWnd);
+			mAppSockets.RedrawText();
+		}
+	}
+}
+void NetworkApp::ObjectKeyPresses(){
+	Speed tSpeed;			
+	tSpeed= mCube.GetSpeed();
+	if(GetAsyncKeyState(VK_DOWN)& 0x8000 ){
+		tSpeed.UpdateDir(0,-0.1,0);
+		mCube.ChangeSpeed(tSpeed);
+	}
+	if(GetAsyncKeyState(VK_UP) & 0x8000){
+		tSpeed.UpdateDir(0,0.1,0);
+		mCube.ChangeSpeed(tSpeed);
+	}
+	if(GetAsyncKeyState(VK_LEFT) & 0x8000){
+		tSpeed.UpdateDir(-0.1,0,0);
+		mCube.ChangeSpeed(tSpeed);
+	}
+	if(GetAsyncKeyState(VK_RIGHT) & 0x8000){
+		tSpeed.UpdateDir(0.1,0,0);
+		mCube.ChangeSpeed(tSpeed);
+	}
+	if(GetAsyncKeyState('Q') & 0x8000){
+		tSpeed.UpdateDir(0,0,0.1);
+		mCube.ChangeSpeed(tSpeed);
+	}
+	if(GetAsyncKeyState('E') & 0x8000){
+		tSpeed.UpdateDir(0,0,-0.1);
+		mCube.ChangeSpeed(tSpeed);
+	}
+	if(GetAsyncKeyState('M') & 0x8000){
+		D3DXVECTOR3 temp(0,0,0);
+		tSpeed.UpdateDir(temp);
+		mCube.ChangeSpeed(tSpeed);
+	}	
+
+	mSphere.Move();
+	if(mPList.Move(mCube)){
+		mAppSockets.UpdatePacket(mCube.GetPos(), mCube.GetSpeed());
+	}
+}
+void NetworkApp::CameraKeyPresses(){
+	//camera movement
+	if(GetAsyncKeyState('A') & 0x8000)	mCamera.MoveLeft();
+	if(GetAsyncKeyState('D') & 0x8000)	mCamera.MoveRight();
+	if(GetAsyncKeyState('W') & 0x8000)	mCamera.MoveForward();
+	if(GetAsyncKeyState('S') & 0x8000)	mCamera.MoveBack();
+	if(GetAsyncKeyState('Z') & 0x8000)	mCamera.MoveUp();
+	if(GetAsyncKeyState('X') & 0x8000)	mCamera.MoveDown();
+	/*
+		//look around the screen using the mouse
+		if(mMousePos.x < (50)){
+			mCamera.OnlyYaw(-2);
+		}
+		else if(mMousePos.x > (mClientWidth-50)){
+			mCamera.OnlyYaw(2);
+		}
+		if(mMousePos.y < (50)){
+			mCamera.OnlyPitch(2);
+		}
+		else if(mMousePos.y > (mClientHeight-50)){
+			mCamera.OnlyPitch(-2);
+		}
+	*/
 }

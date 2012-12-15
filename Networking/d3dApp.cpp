@@ -11,8 +11,8 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	srand(time(NULL));
 	static D3DApp* app = 0;
 
-	switch( msg ){
-		case WM_CREATE:
+	switch(msg){
+		case WM_CREATE:	
 			// Get the 'this' pointer we passed to CreateWindow via the lpParam parameter.
 			CREATESTRUCT* cs = (CREATESTRUCT*)lParam;
 			app = (D3DApp*)cs->lpCreateParams;
@@ -26,7 +26,7 @@ MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	}
 }
 
-D3DApp::D3DApp(HINSTANCE hInstance) {
+D3DApp::D3DApp(HINSTANCE hInstance){
 	mhAppInst   = hInstance;
 	mhMainWnd   = 0;
 	mAppPaused  = false;
@@ -43,11 +43,7 @@ D3DApp::D3DApp(HINSTANCE hInstance) {
 	mDepthStencilView   = 0;
 	mFont               = 0;
 
-	mMainWndCaption = L"D3D10 Application";
-	md3dDriverType  = D3D10_DRIVER_TYPE_HARDWARE;
-	mClearColor     = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
-	mClientWidth    = 800;
-	mClientHeight   = 600;
+	
 }
 
 D3DApp::~D3DApp(){
@@ -84,7 +80,7 @@ int D3DApp::run(){
 			drawScene();
         }
     }
-	appSockets.Clean();
+	mAppSockets.Clean();
 	return (int)msg.wParam;
 }
 
@@ -102,7 +98,7 @@ void D3DApp::initApp(){
     fontDesc.OutputPrecision = OUT_DEFAULT_PRECIS;
     fontDesc.Quality         = DEFAULT_QUALITY;
     fontDesc.PitchAndFamily  = DEFAULT_PITCH | FF_DONTCARE;
-    wcscpy(fontDesc.FaceName, L"Times New Roman");
+    wcscpy_s(fontDesc.FaceName, L"Times New Roman");
 
 	D3DX10CreateFontIndirect(md3dDevice, &fontDesc, &mFont);
 }
@@ -175,42 +171,20 @@ void D3DApp::updateScene(float dt){
 		frameCnt = 0;
 		t_base  += 1.0f;
 	}	
-	if(frameCnt%500==0){
-		if(!appSockets.CheckType()&& appSockets.Connected){
-			appSockets.SendTo();
-		}
-		/*
-		//look around the screen using the mouse
-		if(MousePos.x < (50)){
-			thisCamera.OnlyYaw(-2);
-		}
-		else if(MousePos.x > (mClientWidth-50)){
-			thisCamera.OnlyYaw(2);
-		}
-		if(MousePos.y < (50)){
-			thisCamera.OnlyPitch(2);
-		}
-		else if(MousePos.y > (mClientHeight-50)){
-			thisCamera.OnlyPitch(-2);
-		}*/
-	}
 }
 
-void D3DApp::drawScene()
-{
+void D3DApp::drawScene(){
 	md3dDevice->ClearRenderTargetView(mRenderTargetView, mClearColor);
 	md3dDevice->ClearDepthStencilView(mDepthStencilView, D3D10_CLEAR_DEPTH|D3D10_CLEAR_STENCIL, 1.0f, 0);
 }
 
-LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch( msg )
-	{
+LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
+	switch(msg){
 	//! WM_ACTIVATE is sent when the window is activated or deactivated.  
 	//! We pause the game when the window is deactivated and unpause it 
 	//! when it becomes active.  
 	case WM_ACTIVATE:
-		if( LOWORD(wParam) == WA_INACTIVE ){
+		if(LOWORD(wParam) == WA_INACTIVE){
 			mAppPaused = true;
 			mTimer.stop();
 		}else{
@@ -228,8 +202,7 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 				mAppPaused = true;
 				mMinimized = true;
 				mMaximized = false;
-			}else if(wParam == SIZE_MAXIMIZED)
-			{
+			}else if(wParam == SIZE_MAXIMIZED){
 				mAppPaused = false;
 				mMinimized = false;
 				mMaximized = true;
@@ -240,11 +213,11 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 					mAppPaused = false;
 					mMinimized = false;
 					onResize();
-				}else if( mMaximized ){// Restoring from maximized state?
+				}else if(mMaximized){// Restoring from maximized state?
 					mAppPaused = false;
 					mMaximized = false;
 					onResize();
-				}else if( mResizing ){
+				}else if(mResizing){
 					//! If user is dragging the resize bars, we do not resize 
 					//! the buffers here because as the user continuously 
 					//! drags the resize bars, a stream of WM_SIZE messages are
@@ -253,7 +226,7 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 					//! the resize bars.  So instead, we reset after the user is 
 					//! done resizing the window and releases the resize bars, which 
 					//! sends a WM_EXITSIZEMOVE message.
-				}else{ // API call such as SetWindowPos or mSwapChain->SetFullscreenState.
+				}else{	// API call such as SetWindowPos or mSwapChain->SetFullscreenState.
 					onResize();
 				}
 			}
@@ -277,11 +250,10 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
-
 	//! The WM_MENUCHAR message is sent when a menu is active and the user presses 
 	//! a key that does not correspond to any mnemonic or accelerator key. 
 	case WM_MENUCHAR:
-        // Don't beep when we alt-enter.
+		// Don't beep when we alt-enter.
         return MAKELRESULT(0, MNC_CLOSE);
 	//! Catch this message so to prevent the window from becoming too small.
 	case WM_GETMINMAXINFO:
@@ -289,14 +261,13 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam)
 		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200; 
 		return 0;
 	case WM_MOUSEMOVE:
-		MousePos.x = LOWORD (lParam);
-		MousePos.y = HIWORD (lParam);
+		mMousePos.x = LOWORD (lParam);
+		mMousePos.y = HIWORD (lParam);
 		return 0;
 	}
 	return DefWindowProc(mhMainWnd, msg, wParam, lParam);
 }
-void D3DApp::initMainWindow()
-{
+void D3DApp::initMainWindow(){
 	WNDCLASS wc;
 	wc.style         = CS_HREDRAW | CS_VREDRAW;
 	wc.lpfnWndProc   = MainWndProc; 

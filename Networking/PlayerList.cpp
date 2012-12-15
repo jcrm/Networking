@@ -6,6 +6,9 @@ PlayerList::PlayerList(){
 PlayerList::~PlayerList(){
 
 }
+void PlayerList::Init(ID3D10Device* Device){
+	md3dDevice = Device;
+}
 void PlayerList::AddToList(MyPackets tempPacket){
 	Players tPlayer;
 	tPlayer.PlayerCube.init(md3dDevice);
@@ -22,8 +25,13 @@ void PlayerList::UpdateList(MyPackets tempPacket){
 		}
 	}
 }
-void PlayerList::Init(ID3D10Device* Device){
-	md3dDevice = Device;
+bool PlayerList::CheckList(int tempID){
+	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
+		if(PlayerListIT->ID==tempID){
+			return true;
+		}
+	}
+	return false;
 }
 bool PlayerList::Move(Cube &tempCube){
 	if(LocalList.size()!=0){
@@ -41,9 +49,6 @@ bool PlayerList::Move(Cube &tempCube){
 	}
 	return false;
 }
-void PlayerList::SetLocalID(int LID){
-	LocalID = LID;
-}
 void PlayerList::Draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* mfxWVPVar,ID3D10EffectMatrixVariable* mfxWorldVar, ID3D10EffectTechnique* mTech){
 	if(LocalList.size()!=0){
 		for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
@@ -51,13 +56,8 @@ void PlayerList::Draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariab
 		}
 	}
 }
-bool PlayerList::CheckList(int tempID){
-	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
-		if(PlayerListIT->ID==tempID){
-			return true;
-		}
-	}
-	return false;
+void PlayerList::SetLocalID(int LID){
+	LocalID = LID;
 }
 std::list<Players> PlayerList::GetList(){
 	return LocalList;

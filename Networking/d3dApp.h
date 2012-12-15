@@ -27,8 +27,7 @@ typedef struct Mouse{
 }Mouse;
 
 
-class D3DApp
-{
+class D3DApp{
 public:
 	D3DApp(HINSTANCE hInstance);
 	virtual ~D3DApp();
@@ -38,11 +37,8 @@ public:
 
 	int run();
 
-	Mouse MousePos;
-
 	// Framework methods.  Derived client class overrides these methods to 
 	// implement specific application requirements.
-
 	virtual void initApp();
 	virtual void onResize();// reset projection/etc
 	virtual void updateScene(float dt);
@@ -62,17 +58,13 @@ protected:
 	bool      mMaximized;
 	bool      mResizing;
 
+	Mouse mMousePos;
 	GameTimer	mTimer;
-
-	PlayerList PList;
-
-	Triangle	thisTriangle;
-	Triangle	thatTriangle;
-	Cube		thisCube;
-
-	Sphere		thisSphere;
-	Camera		thisCamera;
-	SOCKETS		appSockets;
+	PlayerList	mPList;
+	Cube		mCube;
+	Sphere		mSphere;
+	Camera		mCamera;
+	SOCKETS		mAppSockets;
 	D3DXVECTOR3 mEyePos;
 
 	std::wstring mFrameStats;
@@ -93,8 +85,6 @@ protected:
 	int mClientWidth;
 	int mClientHeight;
 };
-
-
 
 
 #endif // D3DAPP_H

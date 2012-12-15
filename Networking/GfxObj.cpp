@@ -20,9 +20,9 @@ Speed GfxObj::GetSpeed(){
 }
 void GfxObj::Move(){
 	float dx, dy, dz;
-	dx = mySpeed.Dir.x * mySpeed.velo;
-	dy = mySpeed.Dir.y * mySpeed.velo;
-	dz = mySpeed.Dir.z * mySpeed.velo;
+	dx = mySpeed.mDir.x * mySpeed.mVelo;
+	dy = mySpeed.mDir.y * mySpeed.mVelo;
+	dz = mySpeed.mDir.z * mySpeed.mVelo;
 	Translate(dx,dy,dz);
 }
 void GfxObj::setTrans(void){
