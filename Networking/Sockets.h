@@ -4,6 +4,7 @@
 #include "d3dUtil.h"
 #include "Packet.h"
 #include "Speed.h"
+#include "PlayerList.h"
 #include <list>
 
 struct SocketID{
@@ -45,6 +46,8 @@ public:
 	SOCKET GetSocket();
 	void SetDestinationAddress(char * IP, const int Port);
 	void SendAll();
+	void SendAll(int ID);
+	void SendAllCubes(std::list<Players> LocalList, std::list<Players>::iterator PlayerListIT);
 	void UpdatePacket(D3DXVECTOR3 temp, Speed tempSpeed);
 	void UpdatePacket(float x, float y, float z, Speed tempSpeed);
 	int GetLocalID();

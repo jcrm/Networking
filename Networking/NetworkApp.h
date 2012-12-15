@@ -13,7 +13,7 @@ public:
 	void onResize();
 	void updateScene(float dt);
 	void drawScene(); 
-
+	void LocalRead();
 private:
 	void buildFX();
 	void buildVertexLayouts();

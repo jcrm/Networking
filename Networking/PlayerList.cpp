@@ -51,3 +51,17 @@ void PlayerList::Draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariab
 		}
 	}
 }
+bool PlayerList::CheckList(int tempID){
+	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
+		if(PlayerListIT->ID==tempID){
+			return true;
+		}
+	}
+	return false;
+}
+std::list<Players> PlayerList::GetList(){
+	return LocalList;
+}
+std::list<Players>::iterator PlayerList::GetIterator(){
+	return PlayerListIT;
+}

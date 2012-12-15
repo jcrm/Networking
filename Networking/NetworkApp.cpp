@@ -78,25 +78,11 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 				}//end case FD_CONNECT
 			case FD_READ:{
 					appSockets.ReadFrom(wParam);
-					if(appSockets.CheckType()){
-						if(appSockets.GetNewConnection()){
-							PList.AddToList(appSockets.MyPacket);
-						}else{
-							PList.UpdateList(appSockets.MyPacket);
-						}
-					}else{
-						if(appSockets.GetLocalID()==appSockets.MyPacket.CID && !appSockets.initRead){
-							appSockets.initRead = true;
-							PList.SetLocalID(appSockets.GetLocalID());
-							PList.AddToList(appSockets.MyPacket);
-						}else{
-							PList.UpdateList(appSockets.MyPacket);
-						}
-					}
+					LocalRead();
 					break;
 				}//end case FD_READ
 			case FD_CLOSE:{
-					appSockets.Close(1);
+					appSockets.Close(0);
 					break;
 				}//end case FD_CLOSE
 		}
@@ -131,6 +117,7 @@ void NetworkApp::updateScene(float dt){
 			appSockets.init(0);
 			appSockets.SetAsync(mhMainWnd);
 			appSockets.RedrawText();
+			PList.AddToList(appSockets.MyPacket);
 		}
 	}
 	if(GetAsyncKeyState('N')& 0x8000){
@@ -255,4 +242,26 @@ void NetworkApp::buildVertexLayouts(){
     mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
     HR(md3dDevice->CreateInputLayout(vertexDesc, 2, PassDesc.pIAInputSignature,
 		PassDesc.IAInputSignatureSize, &mVertexLayout));
+}
+void NetworkApp::LocalRead(){
+	if(appSockets.CheckType()){
+		if(appSockets.GetNewConnection()){
+			PList.AddToList(appSockets.MyPacket);
+		}else if(appSockets.MyPacket.ReadyToRecv){
+			appSockets.SendAllCubes(PList.GetList(),PList.GetIterator());
+		}else{
+			PList.UpdateList(appSockets.MyPacket);
+			appSockets.SendAll(appSockets.MyPacket.CID);
+		}
+	}else{
+		if(appSockets.GetLocalID()==appSockets.MyPacket.CID && !appSockets.initRead){
+			appSockets.initRead = true;
+			PList.SetLocalID(appSockets.GetLocalID());
+			PList.AddToList(appSockets.MyPacket);
+		}else if(PList.CheckList(appSockets.MyPacket.CID)){
+			PList.UpdateList(appSockets.MyPacket);
+		}else if(!PList.CheckList(appSockets.MyPacket.CID)){
+			PList.AddToList(appSockets.MyPacket);
+		}
+	}
 }

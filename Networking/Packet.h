@@ -10,6 +10,7 @@ class MyPackets
 public:
 	int PID;
 	int CID;
+	bool ReadyToRecv;
 	D3DXVECTOR3 pos;
 	Speed PacketSpeed;
 	char Text[80];

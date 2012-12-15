@@ -23,8 +23,10 @@ public:
 	void AddToList(MyPackets tempPacket);
 	void UpdateList(MyPackets tempPacket);
 	bool Move(Cube &tempCube);
-	bool CheckList();
+	bool CheckList(int tempID);
 	void SetLocalID(int LID);
+	std::list<Players>::iterator GetIterator();
+	std::list<Players> GetList();
 	void Draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* mfxWVPVar,ID3D10EffectMatrixVariable* mfxWorldVar, ID3D10EffectTechnique* mTech);
 private:
 	std::list<Players> LocalList;

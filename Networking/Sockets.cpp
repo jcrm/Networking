@@ -205,6 +205,26 @@ void SOCKETS::SendAll(){
 		temp++;
 	}
 }
+void SOCKETS::SendAll(int ID){
+	int temp=0;
+	for(it=SIDS.begin(); it!=SIDS.end(); it++){
+		if(it->ID != ID){
+			sprintf(MyPacket.Text,"TEST%d",temp);
+			m_RemoteAddress = it->sin_addr;
+			SendTo();
+		}
+		temp++;
+	}
+}
+void SOCKETS::SendAllCubes(std::list<Players> LocalList, std::list<Players>::iterator PlayerListIT){
+	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
+		MyPacket.CID = PlayerListIT->ID;
+		MyPacket.PacketSpeed = PlayerListIT->PlayerCube.GetSpeed();
+		MyPacket.pos = PlayerListIT->PlayerCube.GetPos();
+		MyPacket.ReadyToRecv = false;
+		SendTo();
+	}
+}
 void SOCKETS::CommonSend(){
 	if(!Server){
 		MyPacket.CID = LocalPacket.CID;
@@ -244,9 +264,13 @@ void SOCKETS::InitRead(){
 		if(!CheckList()){
 			MyPacket.CID = NoCon;
 			SendTo();
+			SendAll(MyPacket.CID);
 		}
 	}else if(!Server && !initRead){
 		LocalPacket.CID = MyPacket.CID;
+		MyPacket.ReadyToRecv = true;
+		SendTo();
+		MyPacket.ReadyToRecv = false;
 	}
 }
 void SOCKETS::CommonRead(){
