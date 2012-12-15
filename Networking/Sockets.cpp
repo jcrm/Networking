@@ -4,7 +4,7 @@
 SOCKETS::SOCKETS(){
 	mInitialised = false;
 	mSocketAddressSize = sizeof(sockaddr_in);
-	mLocalPacket.CID=0;
+	mLocalPacket.SetCID(0);
 	mUDP = true;
 	mInitRead = false;
 	mNewConnection = true;
@@ -142,8 +142,8 @@ void SOCKETS::SetAsync(HWND hwnd){
 void SOCKETS::Accept(WPARAM wParam){
 	int AcceptMsg = accept (wParam,&mYou,&mSocketAddressSize);
 	printf("Client has connected!\n");
-	sprintf_s (mTempPacket.Text, TEXTSIZE, "%c",MSG_CONNECTED); //A
-	printf ("The Following has been sent -> %c\n", mTempPacket.Text[0]);
+	sprintf_s (mTempPacket.mText, TEXTSIZE, "%c",MSG_CONNECTED); //A
+	printf ("The Following has been sent -> %c\n", mTempPacket.mText[0]);
 	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
 	int SendMsg = send (wParam, mBuffer, BUFFERSIZE, 0);
 }
@@ -172,7 +172,7 @@ void SOCKETS::SConnected(){
 void SOCKETS::InitSend(){
 	if(!mServer){
 		if(mConnected){
-			sprintf_s(mTempPacket.Text,"Initial Connect");
+			sprintf_s(mTempPacket.mText,"Initial Connect");
 			SendTo();
 		}else{
 			printf("Not connected to server yet!\n");
@@ -192,18 +192,18 @@ void SOCKETS::SendTo(){
 	int SendMsg = sendto(mSocket, mBuffer, BUFFERSIZE, 0, (struct sockaddr *)&mRemoteAddress, mSocketAddressSize);
 }
 void SOCKETS::SendServer(){
-	mTempPacket.CID = mLocalPacket.CID;
-	mTempPacket.PID = mLocalPacket.PID++;
-	mTempPacket.pos = mLocalPacket.pos;
-	mTempPacket.PacketSpeed= mLocalPacket.PacketSpeed;
-	printf("Sent Packet with ID -> %d\n", mTempPacket.PID);
+	mTempPacket.SetCID(mLocalPacket.GetCID());
+	mTempPacket.SetPID(mLocalPacket.GetPID()+1);
+	mTempPacket.SetPos(mLocalPacket.GetPos());
+	mTempPacket.SetSpeed(mLocalPacket.GetSpeed());
+	printf("Sent Packet with ID -> %d\n", mTempPacket.GetPID());
 	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
 	int SendMsg = sendto(mSocket, mBuffer, BUFFERSIZE, 0, (struct sockaddr *)&mRemoteAddress, mSocketAddressSize);
 }
 void SOCKETS::SendAll(){
 	int temp=0;
 	for(it=SIDS.begin(); it!=SIDS.end(); it++){
-		sprintf_s(mTempPacket.Text,"TEST%d",temp);
+		sprintf_s(mTempPacket.mText,"TEST%d",temp);
 		mRemoteAddress = it->sin_addr;
 		SendTo();
 		temp++;
@@ -213,7 +213,7 @@ void SOCKETS::SendAll(int ID){
 	int temp=0;
 	for(it=SIDS.begin(); it!=SIDS.end(); it++){
 		if(it->ID != ID){
-			sprintf_s(mTempPacket.Text,"TEST%d",temp);
+			sprintf_s(mTempPacket.mText,"TEST%d",temp);
 			mRemoteAddress = it->sin_addr;
 			SendTo();
 		}
@@ -222,20 +222,20 @@ void SOCKETS::SendAll(int ID){
 }
 void SOCKETS::SendAllCubes(std::list<Players> LocalList, std::list<Players>::iterator PlayerListIT){
 	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
-		mTempPacket.CID = PlayerListIT->ID;
-		mTempPacket.PacketSpeed = PlayerListIT->PlayerCube.GetSpeed();
-		mTempPacket.pos = PlayerListIT->PlayerCube.GetPos();
-		mTempPacket.ReadyToRecv = false;
+		mTempPacket.SetCID(PlayerListIT->ID);
+		mTempPacket.SetSpeed(PlayerListIT->PlayerCube.GetSpeed());
+		mTempPacket.SetPos(PlayerListIT->PlayerCube.GetPos());
+		mTempPacket.SetReadyToRecv(false);
 		SendTo();
 	}
 }
 void SOCKETS::CommonSend(){
 	if(!mServer){
-		mTempPacket.CID = mLocalPacket.CID;
-		mTempPacket.PID = mLocalPacket.PID++;
-		mTempPacket.pos = mLocalPacket.pos;
-		mTempPacket.PacketSpeed= mLocalPacket.PacketSpeed;
-		printf("Sent Packet with ID -> %d\n", mTempPacket.PID);
+		mTempPacket.SetCID(mLocalPacket.GetCID());
+		mTempPacket.SetPID(mLocalPacket.GetPID()+1);
+		mTempPacket.SetPos(mLocalPacket.GetPos());
+		mTempPacket.SetSpeed(mLocalPacket.GetSpeed());
+		printf("Sent Packet with ID -> %d\n", mTempPacket.GetPID());
 	}
 	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
 }
@@ -243,15 +243,15 @@ void SOCKETS::CommonSend(){
 void SOCKETS::InitRead(){
 	if(mServer){
 		if(!CheckList()){
-			mTempPacket.CID = SIDS.size();
+			mTempPacket.SetCID(SIDS.size());
 			SendTo();
-			SendAll(mTempPacket.CID);
+			SendAll(mTempPacket.GetCID());
 		}
 	}else if(!mServer && !mInitRead){
-		mLocalPacket.CID = mTempPacket.CID;
-		mTempPacket.ReadyToRecv = true;
+		mLocalPacket.SetCID(mTempPacket.GetCID());
+		mTempPacket.SetReadyToRecv(true);
 		SendTo();
-		mTempPacket.ReadyToRecv = false;
+		mTempPacket.SetReadyToRecv(false);
 	}
 }
 void SOCKETS::Read(){
@@ -270,9 +270,9 @@ void SOCKETS::ReadFrom(WPARAM wParam){
 void SOCKETS::CommonRead(){
 	memcpy(&mTempPacket, mBuffer, sizeof(MyPackets));
 	InitRead();
-	printf("Received Packet with ID -> %d\n", mTempPacket.PID);
-	printf("Msg %s\n", mTempPacket.Text);
-	printf("From -> %d\n", mTempPacket.CID);
+	printf("Received Packet with ID -> %d\n", mTempPacket.GetPID());
+	printf("Msg %s\n", mTempPacket.mText);
+	printf("From -> %d\n", mTempPacket.GetCID());
 }
 //text
 void SOCKETS::ChangeText(std::wstring net){
@@ -287,7 +287,7 @@ void SOCKETS::RedrawText(){
 	std::wostringstream outs;
 	if(mInitialised){
 		outs <<IPText;
-		outs <<"ID:" << mLocalPacket.CID;
+		outs <<"ID:" << mLocalPacket.GetCID();
 	}
 	NetText = outs.str();
 }
@@ -311,14 +311,17 @@ MyPackets SOCKETS::GetLocalPacket(){
 	return mLocalPacket;
 }
 void SOCKETS::UpdatePacket(D3DXVECTOR3 tempPos, Speed tempSpeed){
-	mLocalPacket.pos=tempPos;
-	mLocalPacket.PacketSpeed = tempSpeed;
+	mLocalPacket.SetPos(tempPos);
+	mLocalPacket.SetSpeed(tempSpeed);
 }
 void SOCKETS::UpdatePacket(float x, float y, float z, Speed tempSpeed){
-	mLocalPacket.pos.x+=x;
-	mLocalPacket.pos.y+=y;
-	mLocalPacket.pos.z+=z;
-	mLocalPacket.PacketSpeed = tempSpeed;
+	D3DXVECTOR3 tempPos;
+	tempPos = mLocalPacket.GetPos();
+	tempPos.x+=x;
+	tempPos.y+=y;
+	tempPos.z+=z;
+	mLocalPacket.SetPos(tempPos);
+	mLocalPacket.SetSpeed(tempSpeed);
 }
 //list
 bool SOCKETS::CheckList(){
@@ -339,7 +342,7 @@ bool SOCKETS::CheckList(){
 }
 //Variable Checks
 int SOCKETS::GetLocalID(){
-	return mLocalPacket.CID;
+	return mLocalPacket.GetCID();
 }
 bool SOCKETS::GetServer(){
 	return mServer;

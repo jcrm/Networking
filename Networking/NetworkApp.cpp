@@ -172,20 +172,20 @@ void NetworkApp::LocalRead(){
 	if(mAppSockets.GetServer()){
 		if(mAppSockets.GetNewConnection()){
 			mPList.AddToList(mAppSockets.GetTempPacket());
-		}else if(mAppSockets.GetTempPacket().ReadyToRecv){
+		}else if(mAppSockets.GetTempPacket().GetReadyToRecv()){
 			mAppSockets.SendAllCubes(mPList.GetList(),mPList.GetIterator());
 		}else{
 			mPList.UpdateList(mAppSockets.GetTempPacket());
-			mAppSockets.SendAll(mAppSockets.GetTempPacket().CID);
+			mAppSockets.SendAll(mAppSockets.GetTempPacket().GetCID());
 		}
 	}else{
-		if(mAppSockets.GetLocalID()==mAppSockets.GetTempPacket().CID && !mAppSockets.GetInitRead()){
+		if(mAppSockets.GetLocalID()==mAppSockets.GetTempPacket().GetCID() && !mAppSockets.GetInitRead()){
 			mAppSockets.SetInitRead(true);
 			mPList.SetLocalID(mAppSockets.GetLocalID());
 			mPList.AddToList(mAppSockets.GetTempPacket());
-		}else if(mPList.CheckList(mAppSockets.GetTempPacket().CID)){
+		}else if(mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
 			mPList.UpdateList(mAppSockets.GetTempPacket());
-		}else if(!mPList.CheckList(mAppSockets.GetTempPacket().CID)){
+		}else if(!mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
 			mPList.AddToList(mAppSockets.GetTempPacket());
 		}
 	}

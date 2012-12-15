@@ -12,16 +12,16 @@ void PlayerList::Init(ID3D10Device* Device){
 void PlayerList::AddToList(MyPackets tempPacket){
 	Players tPlayer;
 	tPlayer.PlayerCube.init(md3dDevice);
-	tPlayer.ID = tempPacket.CID;
-	tPlayer.PlayerCube.TranslateTo(tempPacket.pos.x, tempPacket.pos.y, tempPacket.pos.z);
-	tPlayer.PlayerCube.ChangeSpeed(tempPacket.PacketSpeed);
+	tPlayer.ID = tempPacket.GetCID();
+	tPlayer.PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
+	tPlayer.PlayerCube.ChangeSpeed(tempPacket.GetSpeed());
 	LocalList.push_back(tPlayer);
 }
 void PlayerList::UpdateList(MyPackets tempPacket){
 	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
-		if(PlayerListIT->ID == tempPacket.CID){
-			PlayerListIT->PlayerCube.TranslateTo(tempPacket.pos.x, tempPacket.pos.y, tempPacket.pos.z);
-			PlayerListIT->PlayerCube.ChangeSpeed(tempPacket.PacketSpeed);
+		if(PlayerListIT->ID == tempPacket.GetCID()){
+			PlayerListIT->PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
+			PlayerListIT->PlayerCube.ChangeSpeed(tempPacket.GetSpeed());
 		}
 	}
 }
