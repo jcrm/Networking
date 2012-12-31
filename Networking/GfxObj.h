@@ -33,6 +33,7 @@ public:
 	D3DXMATRIX GetWorld();
 	Speed GetSpeed();
 	void ChangeSpeed(Speed tempSpeed);
+	void CaclNewDir(D3DXVECTOR3 tempPackPos, D3DXVECTOR3 tempPackDir);
 protected:
 	Speed mySpeed;
 	DWORD mNumVertices;

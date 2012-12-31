@@ -117,3 +117,37 @@ void GfxObj::draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* 
 		}
 	}
 }
+void GfxObj::CaclNewDir(D3DXVECTOR3 tempPackPos, D3DXVECTOR3 tempPackDir){
+	const static float time = 500.0f;
+	float velo = mySpeed.mVelo;
+	float curPosX, curPosY, curPosZ;
+	curPosX = pos.x;
+	curPosY = pos.y;
+	curPosZ = pos.z;
+//!-------------------------------------
+	float pacVeloX, pacVeloY, pacVeloZ;
+	pacVeloX = tempPackDir.x;
+	pacVeloY = tempPackDir.y;
+	pacVeloZ = tempPackDir.z;
+
+	float pacPosX, pacPosY, pacPosZ;
+	pacPosX = tempPackPos.x;
+	pacPosY = tempPackPos.y;
+	pacPosZ = tempPackPos.z;
+
+	float actPosX, actPosY, actPosZ;
+	actPosX = actPosY = actPosZ = 0.0f;
+
+	float tempVeloX, tempVeloY, tempVeloZ;
+	tempVeloX = tempVeloY = tempVeloZ = 0.0f;
+//!-------------------------------------
+	actPosX = pacPosX + (pacVeloX * time * velo);
+	actPosY = pacPosY + (pacVeloY * time * velo);
+	actPosZ = pacPosZ + (pacVeloZ * time * velo);
+
+	tempVeloX = (actPosX-curPosX)/(time * velo);
+	tempVeloY = (actPosY-curPosY)/(time * velo);
+	tempVeloZ = (actPosZ-curPosZ)/(time * velo);
+
+	mySpeed.mDir = D3DXVECTOR3(tempVeloX,tempVeloY, tempVeloZ);
+}

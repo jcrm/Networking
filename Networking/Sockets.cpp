@@ -94,7 +94,7 @@ void SOCKETS::Create(){
 	}else if(!mServer){
 		printf("The PORT being connected to is: ");
 		printf("%d\n\n", (int)PortNo);
-		SetDestinationAddress("127.0.0.1", PortNo);
+		SetDestinationAddress("192.168.0.16", PortNo);
 	}
 	IPText = outs.str();
 	

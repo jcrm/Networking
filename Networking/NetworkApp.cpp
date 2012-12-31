@@ -210,7 +210,6 @@ void NetworkApp::NetworkKeyPresses(){
 			mAppSockets.Init(0);
 			mAppSockets.SetAsync(mhMainWnd);
 			mAppSockets.RedrawText();
-	
 			mPList.AddToList(mAppSockets.GetTempPacket());
 		}
 	}else if(GetAsyncKeyState('N')& 0x8000){

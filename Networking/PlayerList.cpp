@@ -20,8 +20,9 @@ void PlayerList::AddToList(MyPackets tempPacket){
 void PlayerList::UpdateList(MyPackets tempPacket){
 	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
 		if(PlayerListIT->ID == tempPacket.GetCID()){
-			PlayerListIT->PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
-			PlayerListIT->PlayerCube.ChangeSpeed(tempPacket.GetSpeed());
+			PlayerListIT->PlayerCube.CaclNewDir(tempPacket.GetPos(),tempPacket.GetSpeed().mDir);
+			//PlayerListIT->PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
+			//PlayerListIT->PlayerCube.ChangeSpeed(tempPacket.GetSpeed());
 		}
 	}
 }
@@ -34,20 +35,20 @@ bool PlayerList::CheckList(int tempID){
 	return false;
 }
 bool PlayerList::Move(Cube &tempCube){
+	bool temp= false;
 	if(LocalList.size()!=0){
 		for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
 			if(PlayerListIT->ID==LocalID){
 				PlayerListIT->PlayerCube = tempCube;
 				PlayerListIT->PlayerCube.Move();
 				tempCube = PlayerListIT->PlayerCube;
-				return true;
+				temp = true;
 			}else{
 				PlayerListIT->PlayerCube.Move();
-				return false;
 			}
 		}
 	}
-	return false;
+	return temp;
 }
 void PlayerList::Draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* mfxWVPVar,ID3D10EffectMatrixVariable* mfxWorldVar, ID3D10EffectTechnique* mTech){
 	if(LocalList.size()!=0){
