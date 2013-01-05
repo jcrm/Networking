@@ -2,6 +2,7 @@
 
 MyPackets::MyPackets(){
 	mPID = 0;
+	mBall = true;
 	mCID = 0;
 	mPos = D3DXVECTOR3(0.0,0.0,0.0);
 	mReadyToRecv = false;
@@ -17,6 +18,9 @@ int MyPackets::GetPID(){
 }
 bool MyPackets::GetReadyToRecv(){
 	return mReadyToRecv;
+}
+bool MyPackets::GetBall(){
+	return mBall;
 }
 D3DXVECTOR3 MyPackets::GetPos(){
 	return mPos;
@@ -39,4 +43,7 @@ void MyPackets::SetPos(D3DXVECTOR3 p){
 }
 void MyPackets::SetSpeed(Speed s){
 	mPacketSpeed = s;
+}
+void MyPackets::SetBall(bool b){
+	mBall = true;
 }

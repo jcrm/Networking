@@ -94,7 +94,7 @@ void SOCKETS::Create(){
 	}else if(!mServer){
 		printf("The PORT being connected to is: ");
 		printf("%d\n\n", (int)PortNo);
-		SetDestinationAddress("192.168.0.16", PortNo);
+		SetDestinationAddress("127.0.0.1", PortNo);
 	}
 	IPText = outs.str();
 	
@@ -228,6 +228,17 @@ void SOCKETS::SendAllCubes(std::list<Players> LocalList, std::list<Players>::ite
 		mTempPacket.SetReadyToRecv(false);
 		SendTo();
 	}
+}
+void SOCKETS::SendBall(Speed s, D3DXVECTOR3 p){
+	mTempPacket.SetCID(mLocalPacket.GetCID());
+	mTempPacket.SetPID(mLocalPacket.GetPID()+1);
+	mTempPacket.SetPos(p);
+	mTempPacket.SetSpeed(s);
+	mTempPacket.SetBall(true);
+	printf("Sent Packet with ID -> %d\n", mTempPacket.GetPID());
+	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
+	SendAll();
+	mTempPacket.SetBall(false);
 }
 void SOCKETS::CommonSend(){
 	if(!mServer){

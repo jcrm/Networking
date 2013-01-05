@@ -15,6 +15,7 @@ public:
 	int GetCID();
 	int GetPID();
 	bool GetReadyToRecv();
+	bool GetBall();
 	D3DXVECTOR3 GetPos();
 	Speed GetSpeed();
 
@@ -23,10 +24,12 @@ public:
 	void SetReadyToRecv(bool r);
 	void SetPos(D3DXVECTOR3 p);
 	void SetSpeed(Speed p);
+	void SetBall(bool b);
 
 private:
 	int mCID;
 	int mPID;
+	bool mBall;
 	bool mReadyToRecv;
 	D3DXVECTOR3 mPos;
 	Speed mPacketSpeed;

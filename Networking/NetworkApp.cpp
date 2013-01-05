@@ -97,10 +97,13 @@ void NetworkApp::updateScene(float dt){
 	CameraKeyPresses();
 	
 	if((packetCount++)%500==0){
-		if(!mAppSockets.GetServer()&& mAppSockets.GetConnected()){
-			mAppSockets.SendTo();
-		}else if(mAppSockets.GetServer()){
-			mAppSockets.SendServer();
+		if(mAppSockets.GetInitialised()){
+			if(!mAppSockets.GetServer()&& mAppSockets.GetConnected()){
+				mAppSockets.SendTo();
+			}else if(mAppSockets.GetServer()){
+				mAppSockets.SendServer();
+				mAppSockets.SendBall(mSphere.GetSpeed(),mSphere.GetPos());
+			}
 		}
 	}
 	D3DApp::updateScene(dt);
@@ -126,7 +129,6 @@ void NetworkApp::drawScene(){
 
 	mPList.Draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
 	mSphere.draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
-
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
 	RECT R = {5, 5, 0, 0};
 	md3dDevice->RSSetState(0);
@@ -169,24 +171,34 @@ void NetworkApp::buildVertexLayouts(){
 		PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
 void NetworkApp::LocalRead(){
-	if(mAppSockets.GetServer()){
-		if(mAppSockets.GetNewConnection()){
-			mPList.AddToList(mAppSockets.GetTempPacket());
-		}else if(mAppSockets.GetTempPacket().GetReadyToRecv()){
-			mAppSockets.SendAllCubes(mPList.GetList(),mPList.GetIterator());
+	if(mAppSockets.GetInitialised()){
+		if(mAppSockets.GetServer()){
+			if(mAppSockets.GetNewConnection()){
+				mPList.AddToList(mAppSockets.GetTempPacket());
+				
+			}else if(mAppSockets.GetTempPacket().GetReadyToRecv()){
+				mAppSockets.SendAllCubes(mPList.GetList(),mPList.GetIterator());
+				mAppSockets.SendBall(mSphere.GetSpeed(),mSphere.GetPos());
+			}else{
+				mPList.UpdateList(mAppSockets.GetTempPacket());
+				mAppSockets.SendAll(mAppSockets.GetTempPacket().GetCID());
+			}
 		}else{
-			mPList.UpdateList(mAppSockets.GetTempPacket());
-			mAppSockets.SendAll(mAppSockets.GetTempPacket().GetCID());
-		}
-	}else{
-		if(mAppSockets.GetLocalID()==mAppSockets.GetTempPacket().GetCID() && !mAppSockets.GetInitRead()){
-			mAppSockets.SetInitRead(true);
-			mPList.SetLocalID(mAppSockets.GetLocalID());
-			mPList.AddToList(mAppSockets.GetTempPacket());
-		}else if(mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
-			mPList.UpdateList(mAppSockets.GetTempPacket());
-		}else if(!mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
-			mPList.AddToList(mAppSockets.GetTempPacket());
+			if(mAppSockets.GetLocalID()==mAppSockets.GetTempPacket().GetCID() && !mAppSockets.GetInitRead()){
+				mAppSockets.SetInitRead(true);
+				mPList.SetLocalID(mAppSockets.GetLocalID());
+				mPList.AddToList(mAppSockets.GetTempPacket());
+			}else if(mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
+				if(mAppSockets.GetTempPacket().GetBall()){
+					mSphere.ChangeSpeed(mAppSockets.GetTempPacket().GetSpeed());
+					D3DXVECTOR3 temp = mAppSockets.GetTempPacket().GetPos();
+					mSphere.TranslateTo(temp.x,temp.y,temp.z);
+				}else{
+					mPList.UpdateList(mAppSockets.GetTempPacket());
+				}
+			}else if(!mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
+				mPList.AddToList(mAppSockets.GetTempPacket());
+			}
 		}
 	}
 }
@@ -194,16 +206,22 @@ void NetworkApp::NetworkKeyPresses(){
 	if(GetAsyncKeyState(VK_ESCAPE)& 0x8000){
 		PostQuitMessage(0);
 	}else if(GetAsyncKeyState(VK_F1)& 0x8000){
-		mAppSockets.SendTo();
-		mAppSockets.RedrawText();
+		if(mAppSockets.GetInitialised()){
+			mAppSockets.SendTo();
+			mAppSockets.RedrawText();
+		}
 	}else if(GetAsyncKeyState('C')& 0x8000){
-		mAppSockets.Connect();
-		mAppSockets.RedrawText();
+		if(mAppSockets.GetInitialised()){
+			mAppSockets.Connect();
+			mAppSockets.RedrawText();
+		}
 	}else if(GetAsyncKeyState('P')& 0x8000){
 		ShowWin32Console();
 	}else if(GetAsyncKeyState('T')& 0x8000){
-		mAppSockets.SendAll();
-		mAppSockets.RedrawText();
+		if(mAppSockets.GetInitialised()){
+			mAppSockets.SendAll();
+			mAppSockets.RedrawText();
+		}
 	}else if(GetAsyncKeyState('Y')& 0x8000){
 		if(!mAppSockets.GetInitialised()){
 			cout << "create server\n";
@@ -254,7 +272,12 @@ void NetworkApp::ObjectKeyPresses(){
 		mCube.ChangeSpeed(tSpeed);
 	}	
 
-	mSphere.Move();
+	if(mAppSockets.GetInitialised()){
+		if(mAppSockets.GetServer()){
+			mSphere.RandDir();
+		}
+		mSphere.Move();
+	}
 	if(mPList.Move(mCube)){
 		mAppSockets.UpdatePacket(mCube.GetPos(), mCube.GetSpeed());
 	}

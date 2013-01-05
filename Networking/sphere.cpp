@@ -7,10 +7,10 @@ Sphere::Sphere()
 
 Sphere::~Sphere()
 {
-	ReleaseCOM(mVB);
-	ReleaseCOM(mIB);
 }
-
+void Sphere::RandDir(){
+	mySpeed.RandDir();
+}
 void Sphere::init(ID3D10Device* device, float radius, UINT numSlices, UINT numStacks)
 {
 	md3dDevice = device;
@@ -55,10 +55,6 @@ void Sphere::DrawVertices()
 
 void Sphere::draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* mfxWVPVar,ID3D10EffectMatrixVariable* mfxWorldVar, ID3D10EffectTechnique* mTech){
 	GfxObj::draw(mView,mProj,mfxWVPVar,mfxWorldVar,mTech);
-}
-void Sphere::Move(){
-	mySpeed.RandDir();
-	GfxObj::Move();
 }
 void Sphere::buildStacks(VertexList& vertices, IndexList& indices)
 {

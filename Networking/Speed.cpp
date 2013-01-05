@@ -39,7 +39,7 @@ void Speed::UpdateDir(float dx, float dy, float dz){
 	CheckLimits();
 }
 void Speed::RandDir(){
-	if(mRandDirCount++ == 1000){
+	if(mRandDirCount++ == 2000){
 		int temp = int(mDirLimit);
 		mDir.x = (rand()%(2*temp))-temp;
 		mDir.y = (rand()%(2*temp))-temp;

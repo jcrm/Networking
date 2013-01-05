@@ -34,6 +34,7 @@ public:
 	void SendAll();
 	void SendAll(int ID);
 	void SendAllCubes(std::list<Players> LocalList, std::list<Players>::iterator PlayerListIT);
+	void SendBall(Speed s, D3DXVECTOR3 p);
 	//read
 	void InitRead();
 	void Read();
