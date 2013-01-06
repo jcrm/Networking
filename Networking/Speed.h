@@ -1,7 +1,6 @@
 #ifndef _SPEED_H_
 #define _SPEED_H_
 
-#include "defines.h"
 #include "d3dUtil.h"
 
 class Speed{

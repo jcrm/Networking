@@ -23,7 +23,7 @@ Cube::~Cube(){
 void Cube::buildVertices(VertexList& vertices, IndexList& indices){
 	Vertex v;
 
-	v.colour = D3DXVECTOR4(RandF(),RandF(),RandF(),RandF());
+	v.colour = D3DXVECTOR4(RandF(),RandF(),RandF(),1.0f);
 
 
 	//Front

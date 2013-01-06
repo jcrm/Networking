@@ -10,7 +10,7 @@ Camera::Camera(){
 	forward = 	D3DXVECTOR3( 0.0f, 0.0f,  0.0f);
 	up = 		D3DXVECTOR3( 0.0f, 1.0f,  0.0f);
 	movement = 	D3DXVECTOR3( 0.0f, 0.0f,  0.0f);
-	position = 	D3DXVECTOR3( 0.0f, 0.0f,-10.0f);
+	position = 	D3DXVECTOR3( 0.0f, 0.0f,-30.0f);
 	Yaw = 0;
 	Pitch = 0;
 	Roll = 0;

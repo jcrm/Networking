@@ -38,8 +38,7 @@
 using namespace std;
 
 // the ip address of the server to connect to
-#define LOCALIP "127.0.0.1"
-#define SERVERIP LOCALIP
+#define DEFAULTSERVERIP "127.0.0.1"
 
 //the port of the server to connect to
 #define SERVERPORT 5555

@@ -72,7 +72,7 @@ void SOCKETS::Create(){
 		outs << L"127.0.0.1" <<endl;
 	}else if(!mServer){
 		mMe.sin_port = htons (SERVERPORT);
-		mMe.sin_addr.s_addr = inet_addr (SERVERIP);
+		mMe.sin_addr.s_addr = inet_addr (DEFAULTSERVERIP);
 		printf("The IP address being connected to is: ");
 		printf("%d.", (int)mMe.sin_addr.S_un.S_un_b.s_b1);
 		printf("%d.", (int)mMe.sin_addr.S_un.S_un_b.s_b2);

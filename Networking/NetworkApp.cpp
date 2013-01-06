@@ -152,9 +152,9 @@ void NetworkApp::buildFX(){
 	hr = D3DX10CreateEffectFromFile(L"color.fx", 0, 0, 
 		"fx_4_0", shaderFlags, 0, md3dDevice, 0, 0, &mFX, &compilationErrors, 0);
 	
-	mTech = mFX->GetTechniqueByName("ColorTech");
-	mfxWVPVar			= mFX->GetVariableByName("gWVP")->AsMatrix();
-	mfxWorldVar			= mFX->GetVariableByName("gWorld")->AsMatrix();
+	mTech		= mFX->GetTechniqueByName("ColorTech");
+	mfxWVPVar	= mFX->GetVariableByName("gWVP")->AsMatrix();
+	mfxWorldVar	= mFX->GetVariableByName("gWorld")->AsMatrix();
 }
 
 void NetworkApp::buildVertexLayouts(){

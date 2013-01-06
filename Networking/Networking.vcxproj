@@ -16,7 +16,6 @@
     <ClInclude Include="cube.h" />
     <ClInclude Include="d3dApp.h" />
     <ClInclude Include="d3dUtil.h" />
-    <ClInclude Include="defines.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="GfxObj.h" />
     <ClInclude Include="NetworkApp.h" />
