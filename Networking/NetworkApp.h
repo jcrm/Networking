@@ -21,8 +21,9 @@ private:
 	void CameraKeyPresses();
 	void ObjectKeyPresses();
 	void NetworkKeyPresses();
+	void IPKeyPresses();
 private:	
-
+	char mTempIP[80];
 	ID3D10Effect* mFX;
 	ID3D10EffectTechnique* mTech;
 	ID3D10InputLayout* mVertexLayout;
@@ -30,6 +31,7 @@ private:
 
 	D3DXMATRIX mView;
 	D3DXMATRIX mProj;
+	bool mInputIP;
 };
 
 #endif

@@ -12,6 +12,9 @@ GfxObj::~GfxObj(){
 D3DXVECTOR3 GfxObj::GetPos(){
 	return pos;
 }
+D3DXVECTOR3 GfxObj::GetColour(){
+	return mColour;
+}
 void GfxObj::ChangeSpeed(Speed tempSpeed){
 	mySpeed = tempSpeed;
 }
@@ -69,6 +72,10 @@ D3DXMATRIX GfxObj::GetWorld(){
 
 void GfxObj::init (ID3D10Device* device){
 	md3dDevice=		device;
+}
+void GfxObj::init (ID3D10Device* device, D3DXVECTOR3 c){
+	md3dDevice=		device;
+	mColour = D3DXVECTOR3(c.x,c.y,c.z);
 }
 void GfxObj::buildVB(VertexList& vertices){
 	// Create vertex buffer

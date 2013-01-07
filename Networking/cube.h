@@ -12,6 +12,7 @@ public:
 	void draw();
 	void buildVertices(VertexList& vertices, IndexList& indices);
 	void init(ID3D10Device* device);
+	void init(ID3D10Device* device, D3DXVECTOR3 c);
 	void DrawVertices();
 	float GetPosX();
 	float GetPosY();

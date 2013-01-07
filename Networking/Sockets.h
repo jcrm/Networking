@@ -11,7 +11,14 @@ struct SocketID{
 	struct sockaddr_in sin_addr;
 	int ID;
 };
+struct TextState{
+	enum State{sDefault, sChoose, sAdd, sLatest};
+	State mState;
 
+	TextState(){
+		mState = sDefault;
+	}
+};
 class SOCKETS{
 public:
 	SOCKETS();
@@ -21,6 +28,7 @@ public:
 	void Clean();
 	void Close();
 	void SetAsync(HWND hwnd);
+	void Create();
 	//FD functions
 	void Accept(WPARAM wParam);
 	void Connect();
@@ -50,8 +58,8 @@ public:
 	//packet
 	MyPackets GetTempPacket();
 	MyPackets GetLocalPacket();
-	void UpdatePacket(D3DXVECTOR3 temp, Speed tempSpeed);
-	void UpdatePacket(float x, float y, float z, Speed tempSpeed);
+	void UpdatePacket(D3DXVECTOR3 tempPos, Speed tempSpeed, D3DXVECTOR3 tempColour);
+	void UpdatePacket(float x, float y, float z, Speed tempSpeed, D3DXVECTOR3 tempColour);
 	//List
 	bool CheckList();
 	//Variable Checks
@@ -62,7 +70,10 @@ public:
 	bool GetNewConnection();
 	bool GetInitRead();
 	void SetInitRead(bool b);
+	void AddToIP(int temp);
+	void ClearIP();
 private:
+	char mIP[20];
 	//socket
 	SOCKET mSocket;
 	sockaddr_in mMe;
@@ -86,10 +97,11 @@ private:
 	bool mNewConnection;
 	bool mConnected;
 	bool mInitRead;
+
+	TextState mState;
 private:
 	//functions
 	bool StartWinSock(void);
-	void Create();
 	bool Bind();
 	bool Listening();
 	void CommonRead();

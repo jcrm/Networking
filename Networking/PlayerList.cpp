@@ -11,7 +11,7 @@ void PlayerList::Init(ID3D10Device* Device){
 }
 void PlayerList::AddToList(MyPackets tempPacket){
 	Players tPlayer;
-	tPlayer.PlayerCube.init(md3dDevice);
+	tPlayer.PlayerCube.init(md3dDevice, tempPacket.GetColour());
 	tPlayer.ID = tempPacket.GetCID();
 	tPlayer.PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
 	tPlayer.PlayerCube.ChangeSpeed(tempPacket.GetSpeed());

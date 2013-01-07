@@ -5,9 +5,7 @@
 #include "d3dUtil.h"
 
 class MyPackets{
-public:
-	char mText[80];
-	
+public:	
 	MyPackets();
 	~MyPackets();
 
@@ -16,12 +14,14 @@ public:
 	bool GetReadyToRecv();
 	bool GetBall();
 	D3DXVECTOR3 GetPos();
+	D3DXVECTOR3 GetColour();
 	Speed GetSpeed();
 
 	void SetCID(int c);
 	void SetPID(int p);
 	void SetReadyToRecv(bool r);
 	void SetPos(D3DXVECTOR3 p);
+	void SetColour(D3DXVECTOR3 c);
 	void SetSpeed(Speed p);
 	void SetBall(bool b);
 
@@ -31,6 +31,7 @@ private:
 	bool mBall;
 	bool mReadyToRecv;
 	D3DXVECTOR3 mPos;
+	D3DXVECTOR3 mColour;
 	Speed mPacketSpeed;
 };
 

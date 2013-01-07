@@ -41,7 +41,7 @@ using namespace std;
 #define DEFAULTSERVERIP "127.0.0.1"
 
 //the port of the server to connect to
-#define SERVERPORT 5555
+#define SERVERPORT 5986
 
 #define BUFFERSIZE		(300)
 #define MSG_CONNECTED	(0x41)	//A

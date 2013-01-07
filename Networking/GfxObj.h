@@ -22,6 +22,7 @@ public:
 	GfxObj();
 	~GfxObj();
 	virtual void init(ID3D10Device* device);
+	virtual void init(ID3D10Device* device, D3DXVECTOR3 c);
 	virtual void draw(D3DXMATRIX mView,D3DXMATRIX mProj,ID3D10EffectMatrixVariable* mfxWVPVar,ID3D10EffectMatrixVariable* mfxWorldVar, ID3D10EffectTechnique* mTech);
 	virtual void Move();
 	void setTrans();
@@ -31,6 +32,7 @@ public:
 	void Translate(D3DXVECTOR3 temp);
 	D3DXVECTOR3 GetPos();
 	D3DXMATRIX GetWorld();
+	D3DXVECTOR3 GetColour();
 	Speed GetSpeed();
 	void ChangeSpeed(Speed tempSpeed);
 	void CaclNewDir(D3DXVECTOR3 tempPackPos, D3DXVECTOR3 tempPackDir);
@@ -52,6 +54,10 @@ protected:
 	D3DXVECTOR3 pos, theta, scale;	
 	virtual void buildVB(VertexList& vertices);
 	virtual void buildIB(IndexList& indices);
+
+	D3DXVECTOR3 mColour;
+	
+
 };
 
 #endif // GFXOBJ_H

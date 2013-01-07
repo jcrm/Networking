@@ -33,6 +33,8 @@ NetworkApp::NetworkApp(HINSTANCE hInstance)
 	mClientHeight   = 600;
 	D3DXMatrixIdentity(&mView);
 	D3DXMatrixIdentity(&mProj);
+	mInputIP = false;
+	strcpy(mTempIP, "");
 }
 
 NetworkApp::~NetworkApp(){
@@ -92,9 +94,16 @@ LRESULT NetworkApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 void NetworkApp::updateScene(float dt){
 	static int packetCount = 0;
 
-	NetworkKeyPresses();
-	ObjectKeyPresses();
-	CameraKeyPresses();
+	if(GetAsyncKeyState(VK_ESCAPE)& 0x8000){
+		PostQuitMessage(0);
+	}
+	if(mInputIP){
+		IPKeyPresses();
+	}else{
+		NetworkKeyPresses();
+		ObjectKeyPresses();
+		CameraKeyPresses();
+	}
 	
 	if((packetCount++)%500==0){
 		if(mAppSockets.GetInitialised()){
@@ -175,7 +184,6 @@ void NetworkApp::LocalRead(){
 		if(mAppSockets.GetServer()){
 			if(mAppSockets.GetNewConnection()){
 				mPList.AddToList(mAppSockets.GetTempPacket());
-				
 			}else if(mAppSockets.GetTempPacket().GetReadyToRecv()){
 				mAppSockets.SendAllCubes(mPList.GetList(),mPList.GetIterator());
 				mAppSockets.SendBall(mSphere.GetSpeed(),mSphere.GetPos());
@@ -187,55 +195,41 @@ void NetworkApp::LocalRead(){
 			if(mAppSockets.GetLocalID()==mAppSockets.GetTempPacket().GetCID() && !mAppSockets.GetInitRead()){
 				mAppSockets.SetInitRead(true);
 				mPList.SetLocalID(mAppSockets.GetLocalID());
-				mPList.AddToList(mAppSockets.GetTempPacket());
+				mPList.AddToList(mAppSockets.GetLocalPacket());
+				mAppSockets.RedrawText();
 			}else if(mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
-				if(mAppSockets.GetTempPacket().GetBall()){
+				if(mAppSockets.GetTempPacket().GetBall() && mAppSockets.GetTempPacket().GetCID()==0){
 					mSphere.ChangeSpeed(mAppSockets.GetTempPacket().GetSpeed());
 					D3DXVECTOR3 temp = mAppSockets.GetTempPacket().GetPos();
 					mSphere.TranslateTo(temp.x,temp.y,temp.z);
 				}else{
 					mPList.UpdateList(mAppSockets.GetTempPacket());
 				}
+				mAppSockets.RedrawText();
 			}else if(!mPList.CheckList(mAppSockets.GetTempPacket().GetCID())){
 				mPList.AddToList(mAppSockets.GetTempPacket());
+				mAppSockets.RedrawText();
 			}
 		}
 	}
 }
 void NetworkApp::NetworkKeyPresses(){
-	if(GetAsyncKeyState(VK_ESCAPE)& 0x8000){
-		PostQuitMessage(0);
-	}else if(GetAsyncKeyState(VK_F1)& 0x8000){
-		if(mAppSockets.GetInitialised()){
-			mAppSockets.SendTo();
-			mAppSockets.RedrawText();
-		}
-	}else if(GetAsyncKeyState('C')& 0x8000){
-		if(mAppSockets.GetInitialised()){
-			mAppSockets.Connect();
-			mAppSockets.RedrawText();
-		}
-	}else if(GetAsyncKeyState('P')& 0x8000){
+	if(GetAsyncKeyState('P')& 0x8000){
 		ShowWin32Console();
-	}else if(GetAsyncKeyState('T')& 0x8000){
-		if(mAppSockets.GetInitialised()){
-			mAppSockets.SendAll();
-			mAppSockets.RedrawText();
-		}
 	}else if(GetAsyncKeyState('Y')& 0x8000){
 		if(!mAppSockets.GetInitialised()){
 			cout << "create server\n";
 			mAppSockets.Init(0);
 			mAppSockets.SetAsync(mhMainWnd);
 			mAppSockets.RedrawText();
-			mPList.AddToList(mAppSockets.GetTempPacket());
+			mPList.AddToList(mAppSockets.GetLocalPacket());
 		}
 	}else if(GetAsyncKeyState('N')& 0x8000){
 		if(!mAppSockets.GetInitialised()){
 			cout << "create client\n";
 			mAppSockets.Init(1);
-			mAppSockets.SetAsync(mhMainWnd);
 			mAppSockets.RedrawText();
+			mInputIP = true;
 		}
 	}
 }
@@ -279,7 +273,7 @@ void NetworkApp::ObjectKeyPresses(){
 		mSphere.Move();
 	}
 	if(mPList.Move(mCube)){
-		mAppSockets.UpdatePacket(mCube.GetPos(), mCube.GetSpeed());
+		mAppSockets.UpdatePacket(mCube.GetPos(), mCube.GetSpeed(),mCube.GetColour());
 	}
 }
 void NetworkApp::CameraKeyPresses(){
@@ -290,19 +284,81 @@ void NetworkApp::CameraKeyPresses(){
 	if(GetAsyncKeyState('S') & 0x8000)	mCamera.MoveBack();
 	if(GetAsyncKeyState('Z') & 0x8000)	mCamera.MoveUp();
 	if(GetAsyncKeyState('X') & 0x8000)	mCamera.MoveDown();
-	/*
-		//look around the screen using the mouse
-		if(mMousePos.x < (50)){
-			mCamera.OnlyYaw(-2);
-		}
-		else if(mMousePos.x > (mClientWidth-50)){
-			mCamera.OnlyYaw(2);
-		}
-		if(mMousePos.y < (50)){
-			mCamera.OnlyPitch(2);
-		}
-		else if(mMousePos.y > (mClientHeight-50)){
-			mCamera.OnlyPitch(-2);
-		}
-	*/
+
+}
+void NetworkApp::IPKeyPresses(){
+	/*bool wait = false;
+	if(((GetAsyncKeyState('0') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD0) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(0);
+	}else if(((GetAsyncKeyState('1') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(1);
+	}else if(((GetAsyncKeyState('2') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD2) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(2);
+	}else if(((GetAsyncKeyState('3') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD3) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(3);
+	}else if(((GetAsyncKeyState('4') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD4) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(4);
+	}else if(((GetAsyncKeyState('5') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD5) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(5);
+	}else if(((GetAsyncKeyState('6') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD6) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(6);
+	}else if(((GetAsyncKeyState('7') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD7) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(7);
+	}else if(((GetAsyncKeyState('8') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD8) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(8);
+	}else if(((GetAsyncKeyState('9') & 0x8000) || (GetAsyncKeyState(VK_NUMPAD9) & 0x8000)) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(9);
+	}else if((GetAsyncKeyState(VK_OEM_PERIOD) & 0x8000) && !wait){
+		wait =true;
+		mAppSockets.AddToIP(10);
+	}else if((GetAsyncKeyState(VK_BACK) & 0x8000) && !wait){
+		wait =true;
+		mAppSockets.ClearIP();
+	}else if((GetAsyncKeyState(VK_RETURN) & 0x8000) && !wait){
+		wait =true;
+		mAppSockets.Create();
+		mInputIP = false;
+	}*/
+
+	if(mKeys.Released['0'] || mKeys.Released[VK_NUMPAD0]){
+		mAppSockets.AddToIP(0);
+	}else if(mKeys.Released['1'] || mKeys.Released[VK_NUMPAD1]){
+		mAppSockets.AddToIP(1);
+	}else if(mKeys.Released['2'] || mKeys.Released[VK_NUMPAD2]){
+		mAppSockets.AddToIP(2);
+	}else if(mKeys.Released['3'] || mKeys.Released[VK_NUMPAD3]){
+		mAppSockets.AddToIP(3);
+	}else if(mKeys.Released['4'] || mKeys.Released[VK_NUMPAD4]){
+		mAppSockets.AddToIP(4);
+	}else if(mKeys.Released['5'] || mKeys.Released[VK_NUMPAD5]){
+		mAppSockets.AddToIP(5);
+	}else if(mKeys.Released['6'] || mKeys.Released[VK_NUMPAD6]){
+		mAppSockets.AddToIP(6);
+	}else if(mKeys.Released['7'] || mKeys.Released[VK_NUMPAD7]){
+		mAppSockets.AddToIP(7);
+	}else if(mKeys.Released['8'] || mKeys.Released[VK_NUMPAD8]){
+		mAppSockets.AddToIP(8);
+	}else if(mKeys.Released['9'] || mKeys.Released[VK_NUMPAD9]){
+		mAppSockets.AddToIP(9);
+	}else if(mKeys.Released[VK_OEM_PERIOD] || mKeys.Released[VK_DECIMAL]){
+		mAppSockets.AddToIP(10);
+	}else if(mKeys.Released[VK_BACK] || mKeys.Released[VK_DELETE]){
+		mAppSockets.ClearIP();
+	}else if(mKeys.Released[VK_RETURN]){
+		mAppSockets.Create();
+		mAppSockets.SetAsync(mhMainWnd);
+		mAppSockets.Connect();
+		mAppSockets.RedrawText();
+		mInputIP = false;
+	}
 }

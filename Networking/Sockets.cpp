@@ -9,11 +9,8 @@ SOCKETS::SOCKETS(){
 	mInitRead = false;
 	mNewConnection = true;
 	mConnected = false;
-
-	std::wostringstream outs;
-	outs <<L"Press Y to become Server" <<endl;
-	outs <<L"Press N to become Client" <<endl;
-	NetText = outs.str();
+	sprintf_s(mIP,"");
+	RedrawText();
 }
 SOCKETS::~SOCKETS(){
 	Clean();
@@ -30,8 +27,8 @@ void SOCKETS::Init(int type){
 	}else{
 		printf("WinSock Started \n");
 	}
-	Create();
 	if(mServer){
+		Create();
 		if(!Bind()){
 			printf("Error:  Unable to bind socket!\n");
 		}else{
@@ -67,12 +64,12 @@ void SOCKETS::Create(){
 	std::wostringstream outs;
 	mMe.sin_family = AF_INET;
 	if(mServer){
-		mMe.sin_port = htons (5555);
+		mMe.sin_port = htons (SERVERPORT);
 		mMe.sin_addr.s_addr = htonl (INADDR_ANY);
 		outs << L"127.0.0.1" <<endl;
 	}else if(!mServer){
 		mMe.sin_port = htons (SERVERPORT);
-		mMe.sin_addr.s_addr = inet_addr (DEFAULTSERVERIP);
+		mMe.sin_addr.s_addr = inet_addr (mIP);
 		printf("The IP address being connected to is: ");
 		printf("%d.", (int)mMe.sin_addr.S_un.S_un_b.s_b1);
 		printf("%d.", (int)mMe.sin_addr.S_un.S_un_b.s_b2);
@@ -94,7 +91,7 @@ void SOCKETS::Create(){
 	}else if(!mServer){
 		printf("The PORT being connected to is: ");
 		printf("%d\n\n", (int)PortNo);
-		SetDestinationAddress("127.0.0.1", PortNo);
+		SetDestinationAddress(mIP, PortNo);
 	}
 	IPText = outs.str();
 	
@@ -142,8 +139,6 @@ void SOCKETS::SetAsync(HWND hwnd){
 void SOCKETS::Accept(WPARAM wParam){
 	int AcceptMsg = accept (wParam,&mYou,&mSocketAddressSize);
 	printf("Client has connected!\n");
-	sprintf_s (mTempPacket.mText, TEXTSIZE, "%c",MSG_CONNECTED); //A
-	printf ("The Following has been sent -> %c\n", mTempPacket.mText[0]);
 	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
 	int SendMsg = send (wParam, mBuffer, BUFFERSIZE, 0);
 }
@@ -172,7 +167,6 @@ void SOCKETS::SConnected(){
 void SOCKETS::InitSend(){
 	if(!mServer){
 		if(mConnected){
-			sprintf_s(mTempPacket.mText,"Initial Connect");
 			SendTo();
 		}else{
 			printf("Not connected to server yet!\n");
@@ -196,28 +190,22 @@ void SOCKETS::SendServer(){
 	mTempPacket.SetPID(mLocalPacket.GetPID()+1);
 	mTempPacket.SetPos(mLocalPacket.GetPos());
 	mTempPacket.SetSpeed(mLocalPacket.GetSpeed());
+	mTempPacket.SetBall(false);
 	printf("Sent Packet with ID -> %d\n", mTempPacket.GetPID());
-	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
-	int SendMsg = sendto(mSocket, mBuffer, BUFFERSIZE, 0, (struct sockaddr *)&mRemoteAddress, mSocketAddressSize);
+	SendAll();
 }
 void SOCKETS::SendAll(){
-	int temp=0;
 	for(it=SIDS.begin(); it!=SIDS.end(); it++){
-		sprintf_s(mTempPacket.mText,"TEST%d",temp);
 		mRemoteAddress = it->sin_addr;
 		SendTo();
-		temp++;
 	}
 }
 void SOCKETS::SendAll(int ID){
-	int temp=0;
 	for(it=SIDS.begin(); it!=SIDS.end(); it++){
 		if(it->ID != ID){
-			sprintf_s(mTempPacket.mText,"TEST%d",temp);
 			mRemoteAddress = it->sin_addr;
 			SendTo();
 		}
-		temp++;
 	}
 }
 void SOCKETS::SendAllCubes(std::list<Players> LocalList, std::list<Players>::iterator PlayerListIT){
@@ -225,7 +213,9 @@ void SOCKETS::SendAllCubes(std::list<Players> LocalList, std::list<Players>::ite
 		mTempPacket.SetCID(PlayerListIT->ID);
 		mTempPacket.SetSpeed(PlayerListIT->PlayerCube.GetSpeed());
 		mTempPacket.SetPos(PlayerListIT->PlayerCube.GetPos());
+		mTempPacket.SetColour(PlayerListIT->PlayerCube.GetColour());
 		mTempPacket.SetReadyToRecv(false);
+		mTempPacket.SetBall(false);
 		SendTo();
 	}
 }
@@ -246,6 +236,7 @@ void SOCKETS::CommonSend(){
 		mTempPacket.SetPID(mLocalPacket.GetPID()+1);
 		mTempPacket.SetPos(mLocalPacket.GetPos());
 		mTempPacket.SetSpeed(mLocalPacket.GetSpeed());
+		mTempPacket.SetColour(mLocalPacket.GetColour());
 		printf("Sent Packet with ID -> %d\n", mTempPacket.GetPID());
 	}
 	memcpy(mBuffer, &mTempPacket, sizeof(MyPackets));
@@ -255,11 +246,13 @@ void SOCKETS::InitRead(){
 	if(mServer){
 		if(!CheckList()){
 			mTempPacket.SetCID(SIDS.size());
+			mTempPacket.SetColour(D3DXVECTOR3(RandF(),RandF(),RandF()));
 			SendTo();
 			SendAll(mTempPacket.GetCID());
 		}
 	}else if(!mServer && !mInitRead){
 		mLocalPacket.SetCID(mTempPacket.GetCID());
+		mLocalPacket.SetColour(mTempPacket.GetColour());
 		mTempPacket.SetReadyToRecv(true);
 		SendTo();
 		mTempPacket.SetReadyToRecv(false);
@@ -282,8 +275,8 @@ void SOCKETS::CommonRead(){
 	memcpy(&mTempPacket, mBuffer, sizeof(MyPackets));
 	InitRead();
 	printf("Received Packet with ID -> %d\n", mTempPacket.GetPID());
-	printf("Msg %s\n", mTempPacket.mText);
 	printf("From -> %d\n", mTempPacket.GetCID());
+	printf("Ball: %s",(mTempPacket.GetBall())?"true":"false");
 }
 //text
 void SOCKETS::ChangeText(std::wstring net){
@@ -297,8 +290,33 @@ void SOCKETS::ChangeText(std::wstring net){
 void SOCKETS::RedrawText(){
 	std::wostringstream outs;
 	if(mInitialised){
+		if(mServer){
+			mState.mState=mState.sLatest;
+		}else{
+			if(!mConnected){
+				mState.mState=mState.sAdd;
+			}else if(mConnected){
+				mState.mState=mState.sLatest;
+			}
+		}
+	}else{
+		mState.mState=mState.sChoose;
+	}
+	switch(mState.mState){
+	case mState.sChoose:
+		outs <<L"Press Y to become Server" <<endl;
+		outs <<L"Press N to become Client" <<endl;
+		break;
+	case mState.sAdd:
+		outs <<L"Please enter IP address" <<endl;
+		outs <<L"and press Enter to continue." <<endl;
+		outs << mIP;
+		break;
+	case mState.sLatest:
 		outs <<IPText;
 		outs <<"ID:" << mLocalPacket.GetCID();
+		break;
+	default:break;
 	}
 	NetText = outs.str();
 }
@@ -321,11 +339,12 @@ MyPackets SOCKETS::GetTempPacket(){
 MyPackets SOCKETS::GetLocalPacket(){
 	return mLocalPacket;
 }
-void SOCKETS::UpdatePacket(D3DXVECTOR3 tempPos, Speed tempSpeed){
+void SOCKETS::UpdatePacket(D3DXVECTOR3 tempPos, Speed tempSpeed, D3DXVECTOR3 tempColour){
 	mLocalPacket.SetPos(tempPos);
 	mLocalPacket.SetSpeed(tempSpeed);
+	mLocalPacket.SetColour(tempColour);
 }
-void SOCKETS::UpdatePacket(float x, float y, float z, Speed tempSpeed){
+void SOCKETS::UpdatePacket(float x, float y, float z, Speed tempSpeed, D3DXVECTOR3 tempColour){
 	D3DXVECTOR3 tempPos;
 	tempPos = mLocalPacket.GetPos();
 	tempPos.x+=x;
@@ -372,4 +391,19 @@ bool SOCKETS::GetInitRead(){
 }
 void SOCKETS::SetInitRead(bool b){
 	mInitRead = b;
+}
+void SOCKETS::AddToIP(int temp){
+	int n = 0;
+	if(temp !=10){
+		n=sprintf(mIP, "%s%d", mIP,temp);
+		printf("%s\n",mIP);
+	}else if(temp ==10){
+		n=sprintf(mIP, "%s.", mIP);
+		printf("%s\n",mIP);
+	}
+	RedrawText();
+}
+void SOCKETS::ClearIP(){
+	sprintf(mIP,"");
+	RedrawText();
 }

@@ -25,6 +25,17 @@
 typedef struct Mouse{
 	int x,y;
 }Mouse;
+typedef struct Keys{
+	bool Down[256];
+	bool Released[256];
+
+	void Reset(){
+		for(int i = 0; i < 256; i++){
+			Down[i] = false;
+			Released[i] = false;
+		}
+	}
+}Keys;
 
 
 class D3DApp{
@@ -58,7 +69,8 @@ protected:
 	bool      mMaximized;
 	bool      mResizing;
 
-	Mouse mMousePos;
+	Mouse		mMousePos;
+	Keys		mKeys;
 	GameTimer	mTimer;
 	PlayerList	mPList;
 	Cube		mCube;
@@ -84,6 +96,7 @@ protected:
 	D3DXCOLOR mClearColor;
 	int mClientWidth;
 	int mClientHeight;
+	
 };
 
 

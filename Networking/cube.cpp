@@ -23,8 +23,7 @@ Cube::~Cube(){
 void Cube::buildVertices(VertexList& vertices, IndexList& indices){
 	Vertex v;
 
-	v.colour = D3DXVECTOR4(RandF(),RandF(),RandF(),1.0f);
-
+	v.colour = D3DXVECTOR4(mColour.x,mColour.y,mColour.z,1.0f);
 
 	//Front
 	v.pos = D3DXVECTOR3(-1.0f, -1.0f, -1.0f);
@@ -132,80 +131,15 @@ void Cube::init(ID3D10Device* device){
 	mNumFaces=		12;
 	mNumIndices =	36;
 	indexed = true;
+	mColour = D3DXVECTOR3(RandF(),RandF(),RandF());
 	DrawVertices();
 }
-
-
-
-
-
-
-/*
-		{D3DXVECTOR3(-1.0f, -1.0f, -1.0f)},		//A
-		{D3DXVECTOR3(-1.0f, +1.0f, -1.0f)},		//B
-		{D3DXVECTOR3(+1.0f, +1.0f, -1.0f)},		//C
-		{D3DXVECTOR3(+1.0f, +1.0f, -1.0f)},		//C
-		{D3DXVECTOR3(+1.0f, -1.0f, -1.0f)},		//D
-		{D3DXVECTOR3(-1.0f, -1.0f, -1.0f)},		//A
-
-		{D3DXVECTOR3(-1.0f, -1.0f, +1.0f)},		//E
-		{D3DXVECTOR3(-1.0f, +1.0f, +1.0f)},		//F
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(+1.0f, -1.0f, +1.0f)},		//H
-		{D3DXVECTOR3(-1.0f, -1.0f, +1.0f)},		//E
-		
-		{D3DXVECTOR3(+1.0f, -1.0f, -1.0f)},		//D
-		{D3DXVECTOR3(+1.0f, +1.0f, -1.0f)},		//C
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(+1.0f, -1.0f, +1.0f)},		//H
-		{D3DXVECTOR3(+1.0f, -1.0f, -1.0f)},		//D
-
-		{D3DXVECTOR3(-1.0f, -1.0f, +1.0f)},		//E
-		{D3DXVECTOR3(-1.0f, -1.0f, -1.0f)},		//A
-		{D3DXVECTOR3(+1.0f, -1.0f, -1.0f)},		//D
-		{D3DXVECTOR3(+1.0f, -1.0f, -1.0f)},		//D
-		{D3DXVECTOR3(+1.0f, -1.0f, +1.0f)},		//H
-		{D3DXVECTOR3(-1.0f, -1.0f, +1.0f)},		//E
-
-		{D3DXVECTOR3(+1.0f, -1.0f, +1.0f)},		//H
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(-1.0f, +1.0f, +1.0f)},		//F
-		{D3DXVECTOR3(-1.0f, +1.0f, +1.0f)},		//F
-		{D3DXVECTOR3(-1.0f, -1.0f, +1.0f)},		//E
-		{D3DXVECTOR3(+1.0f, -1.0f, +1.0f)},		//H
-
-		{D3DXVECTOR3(-1.0f, +1.0f, -1.0f)},		//B
-		{D3DXVECTOR3(-1.0f, +1.0f, +1.0f)},		//F
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f)},		//G
-		{D3DXVECTOR3(+1.0f, +1.0f, -1.0f)},		//C
-		{D3DXVECTOR3(-1.0f, +1.0f, -1.0f)},		//B*/
-
-
-
-
-
-	/*Vertex vertices[] =
-    {
-		{D3DXVECTOR3(-1.0f, -1.0f, -1.0f), D3DXVECTOR3(-1.0f, -1.0f, -1.0f), WHITE, WHITE},		//A - 0
-		{D3DXVECTOR3(-1.0f, +1.0f, -1.0f), D3DXVECTOR3(-1.0f, +1.0f, -1.0f), WHITE, WHITE},		//B - 1
-		{D3DXVECTOR3(+1.0f, +1.0f, -1.0f), D3DXVECTOR3(+1.0f, +1.0f, -1.0f), WHITE, WHITE},		//C - 2
-		{D3DXVECTOR3(+1.0f, -1.0f, -1.0f), D3DXVECTOR3(+1.0f, -1.0f, -1.0f), WHITE, WHITE},		//D - 3
-
-		{D3DXVECTOR3(-1.0f, -1.0f, +1.0f), D3DXVECTOR3(-1.0f, -1.0f, +1.0f), WHITE, WHITE},		//E - 4
-		{D3DXVECTOR3(-1.0f, +1.0f, +1.0f), D3DXVECTOR3(-1.0f, +1.0f, +1.0f), WHITE, WHITE},		//F - 5
-		{D3DXVECTOR3(+1.0f, +1.0f, +1.0f), D3DXVECTOR3(+1.0f, +1.0f, +1.0f), WHITE, WHITE},		//G - 6
-		{D3DXVECTOR3(+1.0f, -1.0f, +1.0f), D3DXVECTOR3(+1.0f, -1.0f, +1.0f), WHITE, WHITE},		//H - 7
-		
-    };*/
-
-
-	/*// Create indices
-    unsigned int indices[] = {	0, 1, 2, 2, 3, 0,
-								1, 5, 6, 6, 2, 1,
-								4, 0, 3, 3, 7, 4,
-								4, 5, 1, 1, 0, 4,
-								3, 2, 6, 6, 7, 3,
-								7, 6, 5, 5, 4, 7};*/
+void Cube::init(ID3D10Device* device, D3DXVECTOR3 c){
+	md3dDevice = device;
+	mNumVertices=	8;
+	mNumFaces=		12;
+	mNumIndices =	36;
+	indexed = true;
+	mColour = D3DXVECTOR3(c.x,c.y,c.z);
+	DrawVertices();
+}

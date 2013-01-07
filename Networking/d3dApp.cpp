@@ -43,7 +43,7 @@ D3DApp::D3DApp(HINSTANCE hInstance){
 	mDepthStencilView   = 0;
 	mFont               = 0;
 
-	
+	mKeys.Reset();
 }
 
 D3DApp::~D3DApp(){
@@ -78,6 +78,7 @@ int D3DApp::run(){
 				Sleep(50);
 			}
 			drawScene();
+			mKeys.Reset();
         }
     }
 	mAppSockets.Clean();
@@ -263,6 +264,13 @@ LRESULT D3DApp::msgProc(UINT msg, WPARAM wParam, LPARAM lParam){
 	case WM_MOUSEMOVE:
 		mMousePos.x = LOWORD (lParam);
 		mMousePos.y = HIWORD (lParam);
+		return 0;
+	case WM_KEYDOWN:
+		mKeys.Down[wParam] = true;
+		return 0;
+	case WM_KEYUP:
+		mKeys.Released[wParam] = true;
+		mKeys.Down[wParam] = false;
 		return 0;
 	}
 	return DefWindowProc(mhMainWnd, msg, wParam, lParam);
