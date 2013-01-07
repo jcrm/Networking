@@ -20,9 +20,12 @@ void PlayerList::AddToList(MyPackets tempPacket){
 void PlayerList::UpdateList(MyPackets tempPacket){
 	for(PlayerListIT=LocalList.begin(); PlayerListIT!=LocalList.end();PlayerListIT++){
 		if(PlayerListIT->ID == tempPacket.GetCID()){
-			PlayerListIT->PlayerCube.CaclNewDir(tempPacket.GetPos(),tempPacket.GetSpeed().mDir);
-			//PlayerListIT->PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
-			//PlayerListIT->PlayerCube.ChangeSpeed(tempPacket.GetSpeed());
+			if(tempPacket.GetSpeed().mDir.x == 0 && tempPacket.GetSpeed().mDir.y == 0 && tempPacket.GetSpeed().mDir.z == 0){
+				PlayerListIT->PlayerCube.TranslateTo(tempPacket.GetPos().x, tempPacket.GetPos().y, tempPacket.GetPos().z);
+				PlayerListIT->PlayerCube.ChangeSpeed(tempPacket.GetSpeed());
+			}else{
+				PlayerListIT->PlayerCube.CaclNewDir(tempPacket.GetPos(),tempPacket.GetSpeed().mDir);
+			}
 		}
 	}
 }

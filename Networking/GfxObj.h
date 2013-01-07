@@ -57,7 +57,7 @@ protected:
 
 	D3DXVECTOR3 mColour;
 	
-
+	void CheckBounds();
 };
 
 #endif // GFXOBJ_H

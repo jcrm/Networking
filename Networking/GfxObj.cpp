@@ -27,6 +27,7 @@ void GfxObj::Move(){
 	dy = mySpeed.mDir.y * mySpeed.mVelo;
 	dz = mySpeed.mDir.z * mySpeed.mVelo;
 	Translate(dx,dy,dz);
+	CheckBounds();
 }
 void GfxObj::setTrans(void){
 	D3DXMATRIX m;
@@ -157,4 +158,15 @@ void GfxObj::CaclNewDir(D3DXVECTOR3 tempPackPos, D3DXVECTOR3 tempPackDir){
 	tempVeloZ = (actPosZ-curPosZ)/(time * velo);
 
 	mySpeed.mDir = D3DXVECTOR3(tempVeloX,tempVeloY, tempVeloZ);
+}
+void GfxObj::CheckBounds(){
+	D3DXVECTOR3 bound = D3DXVECTOR3(15.0f,10.0f,10.0f);
+	if(pos.x > bound.x) pos.x = bound.x;
+	else if(pos.x < -bound.x) pos.x = -bound.x;
+
+	if(pos.y > bound.y) pos.y = bound.y;
+	else if(pos.y < -bound.y) pos.y = -bound.y;
+
+	if(pos.z > bound.z) pos.z = bound.z;
+	else if(pos.z < -bound.z) pos.z = -bound.z;
 }
